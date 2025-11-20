@@ -268,7 +268,7 @@ export const mockAnalystRankings: AnalystRankingEntry[] = [
       targetError: 13.8,
       relativeReturn: -3.7,
       relativeTargetError: 6.1,
-      compositeScore: 62,
+      compositeScore: 100,
     },
   },
 ];
