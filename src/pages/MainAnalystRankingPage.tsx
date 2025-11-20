@@ -72,7 +72,7 @@ const SectionTitle = styled.h2`
   color: #333;
 `;
 
-type SortType = 'accuracy' | 'return' | 'error';
+type SortType = 'accuracy' | 'return' | 'error' | 'score';
 
 const PAGE_SIZE = 10;
 
@@ -89,6 +89,9 @@ export const MainAnalystRankingPage = () => {
       } else if (sortType === 'return') {
         // metrics.avgReturn 내림차순 (높은 순)
         return b.metrics.avgReturn - a.metrics.avgReturn;
+      } else if (sortType === 'score') {
+        // compositeScore 내림차순 (높은 순)
+        return b.metrics.compositeScore - a.metrics.compositeScore;
       } else {
         // metrics.targetError 오름차순 (낮은 순일수록 좋은 순)
         return a.metrics.targetError - b.metrics.targetError;
@@ -144,6 +147,15 @@ export const MainAnalystRankingPage = () => {
           }}
         >
           오차율
+        </SortButton>
+        <SortButton
+          active={sortType === 'score'}
+          onClick={() => {
+            setSortType('score');
+            setCurrentPage(1);
+          }}
+        >
+          종합 점수
         </SortButton>
       </SortBar>
 
