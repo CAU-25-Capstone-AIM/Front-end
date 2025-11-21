@@ -1,4 +1,4 @@
-import { SectorRankingEntry } from '../models/sector';
+import type { SectorRankingEntry } from '../models/sector';
 
 export const mockSectorRankings: SectorRankingEntry[] = [
   {
