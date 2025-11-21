@@ -150,6 +150,11 @@ const CardWrapper = styled.div`
   flex-direction: column;
   gap: 12px;
   position: relative;
+  z-index: 0;
+
+  &:hover {
+    z-index: 10;
+  }
 `;
 
 const HeaderRow = styled.div`
@@ -216,11 +221,17 @@ const LegendLabel = styled.span`
 `;
 
 const TooltipWrapper = styled.div`
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
   background: #ffffff;
   padding: 12px 16px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   font-size: 12px;
+  white-space: nowrap;
 `;
 
 const TooltipTitle = styled.div`
