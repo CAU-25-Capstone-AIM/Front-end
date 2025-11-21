@@ -4,6 +4,7 @@ import { MainAnalystRankingPage } from './pages/MainAnalystRankingPage';
 import { StockDetailPage } from './pages/StockDetailPage';
 import { AnalystDetailPage } from './pages/AnalystDetailPage';
 import { StockRankingPage } from './pages/StockRankingPage';
+import { SectorRankingPage } from './pages/SectorRankingPage';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -34,7 +35,7 @@ const NavButton = styled.button<{ active: boolean }>`
   }
 `;
 
-type PageType = 'ranking' | 'stockRanking' | 'stock' | 'analyst';
+type PageType = 'ranking' | 'stockRanking' | 'stock' | 'analyst' | 'sectors';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('ranking');
@@ -49,6 +50,8 @@ function App() {
         return <StockDetailPage />;
       case 'analyst':
         return <AnalystDetailPage />;
+      case 'sectors':
+        return <SectorRankingPage />;
       default:
         return <MainAnalystRankingPage />;
     }
@@ -80,6 +83,12 @@ function App() {
           onClick={() => setCurrentPage('analyst')}
         >
           애널리스트 상세
+        </NavButton>
+        <NavButton
+          active={currentPage === 'sectors'}
+          onClick={() => setCurrentPage('sectors')}
+        >
+          섹터 랭킹
         </NavButton>
       </Navigation>
       {renderPage()}
