@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { HeroSlide } from './HeroSlide';
 
 export type HeroSlideConfig = {
@@ -47,6 +48,7 @@ const slides: HeroSlideConfig[] = [
 
 export const HeroSlider: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -71,9 +73,20 @@ export const HeroSlider: React.FC = () => {
   };
 
   const handleCta = (target: HeroSlideConfig['ctaTarget']) => {
-    // 라우팅 연결 예정: 현재는 노출 확인용 로그
-    // eslint-disable-next-line no-console
-    console.log('[HeroSlider CTA]', target);
+    switch (target) {
+      case 'analystRanking':
+        navigate('/analysts');
+        break;
+      case 'stockRanking':
+        navigate('/stocks');
+        break;
+      case 'sectorRanking':
+        navigate('/sectors');
+        break;
+      case 'intro':
+      default:
+        navigate('/');
+    }
   };
 
   return (
