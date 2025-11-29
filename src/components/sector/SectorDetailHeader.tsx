@@ -23,9 +23,9 @@ export const SectorDetailHeader: React.FC<SectorDetailHeaderProps> = ({
     {
       key: 'consensus',
       strongBuy: (ratings.strongBuy / denominator) * 100,
-      moderateBuy: (ratings.moderateBuy / denominator) * 100,
+      moderateBuy: (ratings.Buy / denominator) * 100,
       hold: (ratings.hold / denominator) * 100,
-      moderateSell: (ratings.moderateSell / denominator) * 100,
+      moderateSell: (ratings.Sell / denominator) * 100,
       strongSell: (ratings.strongSell / denominator) * 100,
     },
   ];

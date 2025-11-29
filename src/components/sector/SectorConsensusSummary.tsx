@@ -9,9 +9,9 @@ type SectorConsensusSummaryProps = {
 
 const ratingLabels: Record<keyof SectorConsensusBreakdown, string> = {
   strongBuy: 'Strong Buy',
-  moderateBuy: 'Moderate Buy',
+  Buy: 'Moderate Buy',
   hold: 'Hold',
-  moderateSell: 'Moderate Sell',
+  Sell: 'Moderate Sell',
   strongSell: 'Strong Sell',
 };
 
