@@ -38,7 +38,7 @@ export const StockMiniCard: React.FC<StockMiniCardProps> = ({
           <MetricValue>{upside.toFixed(1)}%</MetricValue>
         </MetricItem>
         <MetricItem>
-          <MetricLabel>매수 비율</MetricLabel>
+          <MetricLabel>매수 의견 비율</MetricLabel>
           <MetricValue>{buyRatio.toFixed(1)}%</MetricValue>
         </MetricItem>
       </MetricsRow>
