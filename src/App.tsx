@@ -6,6 +6,7 @@ import { AnalystDetailPage } from './pages/AnalystDetailPage';
 import { StockRankingPage } from './pages/StockRankingPage';
 import { SectorRankingPage } from './pages/SectorRankingPage';
 import { SectorDetailPreview } from './pages/SectorDetailPage';
+import { HomePage } from './pages/HomePage';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -36,13 +37,22 @@ const NavButton = styled.button<{ active: boolean }>`
   }
 `;
 
-type PageType = 'ranking' | 'stockRanking' | 'stock' | 'analyst' | 'sectors' | 'sectorDetail';
+type PageType =
+  | 'home'
+  | 'ranking'
+  | 'stockRanking'
+  | 'stock'
+  | 'analyst'
+  | 'sectors'
+  | 'sectorDetail';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('ranking');
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'home':
+        return <HomePage />;
       case 'ranking':
         return <MainAnalystRankingPage />;
       case 'stockRanking':
@@ -63,6 +73,12 @@ function App() {
   return (
     <AppContainer>
       <Navigation>
+        <NavButton
+          active={currentPage === 'home'}
+          onClick={() => setCurrentPage('home')}
+        >
+          홈
+        </NavButton>
         <NavButton
           active={currentPage === 'ranking'}
           onClick={() => setCurrentPage('ranking')}
