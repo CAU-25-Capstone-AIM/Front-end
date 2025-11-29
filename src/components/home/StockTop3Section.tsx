@@ -8,9 +8,14 @@ export type StockRankingEntry = (typeof mockStockRankings)[number];
 export type StockTop3SectionProps = {
   stocks: StockRankingEntry[];
   onClickStockDetail?: (ticker: string) => void;
+  onClickSeeAll?: () => void;
 };
 
-export const StockTop3Section: React.FC<StockTop3SectionProps> = ({ stocks, onClickStockDetail }) => {
+export const StockTop3Section: React.FC<StockTop3SectionProps> = ({
+  stocks,
+  onClickStockDetail,
+  onClickSeeAll,
+}) => {
   return (
     <SectionWrapper>
       <SectionHeader>
@@ -21,8 +26,9 @@ export const StockTop3Section: React.FC<StockTop3SectionProps> = ({ stocks, onCl
         <SectionAction
           type="button"
           onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log('Go to stock ranking page');
+            if (onClickSeeAll) {
+              onClickSeeAll();
+            }
           }}
         >
           종목 랭킹 전체 보기 →

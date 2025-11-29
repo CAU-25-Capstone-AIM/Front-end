@@ -8,11 +8,13 @@ export type SectorRankingEntry = (typeof mockSectorRankings)[number];
 export type SectorTop3SectionProps = {
   sectors: SectorRankingEntry[];
   onClickSectorDetail?: (sectorId: string) => void;
+  onClickSeeAll?: () => void;
 };
 
 export const SectorTop3Section: React.FC<SectorTop3SectionProps> = ({
   sectors,
   onClickSectorDetail,
+  onClickSeeAll,
 }) => {
   return (
     <SectionWrapper>
@@ -22,8 +24,9 @@ export const SectorTop3Section: React.FC<SectorTop3SectionProps> = ({
         <SectionAction
           type="button"
           onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log('Go to sector ranking page');
+            if (onClickSeeAll) {
+              onClickSeeAll();
+            }
           }}
         >
           섹터 랭킹 전체 보기 →

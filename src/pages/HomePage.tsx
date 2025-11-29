@@ -21,20 +21,35 @@ export const HomePage: React.FC = () => {
   const top3Stocks = [...mockStockRankings].sort((a, b) => b.upside - a.upside).slice(0, 3);
   const top3Sectors = [...mockSectorRankings].sort((a, b) => b.buyRatio - a.buyRatio).slice(0, 3);
 
+  const handleGoAnalystRanking = () => {
+    navigate('/analysts');
+  };
+
+  const handleGoStockRanking = () => {
+    navigate('/stocks');
+  };
+
+  const handleGoSectorRanking = () => {
+    navigate('/sectors');
+  };
+
   return (
     <PageContainer>
       <HeroSlider />
       <AnalystTop3Section
         analysts={top3Analysts}
         onClickAnalystDetail={(analystId) => navigate(`/analysts/${analystId}`)}
+        onClickSeeAll={handleGoAnalystRanking}
       />
       <StockTop3Section
         stocks={top3Stocks}
         onClickStockDetail={(ticker) => navigate(`/stocks/${ticker}`)}
+        onClickSeeAll={handleGoStockRanking}
       />
       <SectorTop3Section
         sectors={top3Sectors}
         onClickSectorDetail={(sectorId) => navigate(`/sectors/${sectorId}`)}
+        onClickSeeAll={handleGoSectorRanking}
       />
     </PageContainer>
   );

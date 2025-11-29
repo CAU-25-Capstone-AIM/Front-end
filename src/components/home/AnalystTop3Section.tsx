@@ -8,11 +8,13 @@ export type AnalystRankingEntry = (typeof mockAnalystRankings)[number];
 export type AnalystTop3SectionProps = {
   analysts: AnalystRankingEntry[];
   onClickAnalystDetail?: (analystId: string) => void;
+  onClickSeeAll?: () => void;
 };
 
 export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({
   analysts,
   onClickAnalystDetail,
+  onClickSeeAll,
 }) => {
   return (
     <SectionWrapper>
@@ -24,8 +26,9 @@ export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({
         <SectionAction
           type="button"
           onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log('Go to analyst ranking page');
+            if (onClickSeeAll) {
+              onClickSeeAll();
+            }
           }}
         >
           애널리스트 랭킹 전체 보기 →
