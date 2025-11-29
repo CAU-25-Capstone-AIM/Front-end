@@ -8,7 +8,7 @@ export type StockRankingCardProps = {
   upside: number;
   buyRatio: number;
   rank: number;
-  onClick?: () => void;
+  onClickDetail?: () => void;
 };
 
 export const StockRankingCard: React.FC<StockRankingCardProps> = ({
@@ -18,13 +18,16 @@ export const StockRankingCard: React.FC<StockRankingCardProps> = ({
   upside,
   buyRatio,
   rank,
-  onClick,
+  onClickDetail,
 }) => {
   const formattedUpside =
     upside >= 0 ? `+${upside.toFixed(1)}%` : `${upside.toFixed(1)}%`;
 
   return (
-    <CardWrapper onClick={onClick} $clickable={Boolean(onClick)}>
+    <CardWrapper
+      onClick={onClickDetail}
+      $clickable={Boolean(onClickDetail)}
+    >
       <HeaderRow>
         <div>
           <Title>{name}</Title>

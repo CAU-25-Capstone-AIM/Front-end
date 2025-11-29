@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { mockSectorRankings } from '../mocks/sectorRankings';
 import { SectorRankingCard } from '../components/sector/SectorRankingCard';
 
 type SectorSortType = 'buyHigh' | 'buyLow';
 
 export const SectorRankingPage = () => {
+  const navigate = useNavigate();
   const [sortType, setSortType] = useState<SectorSortType>('buyHigh');
 
   const sortedSectors = [...mockSectorRankings].sort((a, b) => {
@@ -52,6 +54,7 @@ export const SectorRankingPage = () => {
               ratings={sector.ratings}
               buyRatio={sector.buyRatio}
               rank={index + 1}
+              onClickDetail={() => navigate(`/sectors/${sector.id}`)}
             />
           ))}
         </CardList>

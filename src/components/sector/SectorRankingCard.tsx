@@ -24,6 +24,7 @@ export type SectorRankingCardProps = {
   ratings: SectorConsensusBreakdown;
   buyRatio: number; // 매수율 (%) = (strongBuy + moderateBuy) / totalStocks * 100
   rank: number; // 랭킹 (1, 2, 3...)
+  onClickDetail?: () => void;
 };
 
 export const SectorRankingCard: React.FC<SectorRankingCardProps> = ({
@@ -32,6 +33,7 @@ export const SectorRankingCard: React.FC<SectorRankingCardProps> = ({
   ratings,
   buyRatio,
   rank,
+  onClickDetail,
 }) => {
   const { strongBuy, moderateBuy, hold, moderateSell, strongSell } = ratings;
 
@@ -53,7 +55,14 @@ export const SectorRankingCard: React.FC<SectorRankingCardProps> = ({
   ];
 
   return (
-    <CardWrapper>
+    <CardWrapper
+      $clickable={Boolean(onClickDetail)}
+      onClick={() => {
+        if (onClickDetail) {
+          onClickDetail();
+        }
+      }}
+    >
       <HeaderRow>
         <div>
           <Title>{name}</Title>
@@ -141,7 +150,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, name: sectorName,
   );
 };
 
-const CardWrapper = styled.div`
+const CardWrapper = styled.div<{ $clickable: boolean }>`
   background: #ffffff;
   border-radius: 12px;
   padding: 16px 20px;
@@ -151,9 +160,14 @@ const CardWrapper = styled.div`
   gap: 12px;
   position: relative;
   z-index: 0;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
     z-index: 10;
+    transform: ${({ $clickable }) => ($clickable ? 'translateY(-2px)' : 'none')};
+    box-shadow: ${({ $clickable }) =>
+      $clickable ? '0 4px 12px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(0, 0, 0, 0.06)'};
   }
 `;
 

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnalystCard } from '../components/analyst/AnalystCard';
 import { Pagination } from '../components/common/Pagination';
 import { mockAnalystRankings } from '../mocks/analystRankings';
@@ -77,6 +78,7 @@ type SortType = 'accuracy' | 'return' | 'error' | 'score';
 const PAGE_SIZE = 10;
 
 export const MainAnalystRankingPage = () => {
+  const navigate = useNavigate();
   const [sortType, setSortType] = useState<SortType>('accuracy');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -172,6 +174,7 @@ export const MainAnalystRankingPage = () => {
             avgReturn={analyst.metrics.avgReturn}
             targetError={analyst.metrics.targetError}
             compositeScore={analyst.metrics.compositeScore}
+            onClickDetail={() => navigate(`/analysts/${analyst.id}`)}
           />
         ))}
         <Pagination

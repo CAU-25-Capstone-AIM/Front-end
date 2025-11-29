@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { StockRankingCard } from '../components/stock/StockRankingCard';
 import { Pagination } from '../components/common/Pagination';
 import { mockStockRankings } from '../mocks/stockRankings';
@@ -9,6 +10,7 @@ type StockSortType = 'upsideHigh' | 'upsideLow' | 'buyHigh' | 'buyLow';
 const PAGE_SIZE = 10;
 
 export const StockRankingPage = () => {
+  const navigate = useNavigate();
   const [sortType, setSortType] = useState<StockSortType>('upsideHigh');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -96,7 +98,7 @@ export const StockRankingPage = () => {
               upside={stock.upside}
               buyRatio={stock.buyRatio}
               rank={startIndex + index + 1}
-              onClick={() => console.log('go to stock detail:', stock.ticker)}
+              onClickDetail={() => navigate(`/stocks/${stock.ticker}`)}
             />
           ))}
         </CardList>

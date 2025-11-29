@@ -10,7 +10,7 @@ type AnalystCardProps = {
   avgReturn: number;
   targetError: number;
   compositeScore?: number;
-  onClick?: () => void;
+  onClickDetail?: () => void;
 };
 
 const Container = styled.div<{ hasOnClick: boolean }>`
@@ -129,10 +129,10 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
   avgReturn,
   targetError,
   compositeScore,
-  onClick,
+  onClickDetail,
 }) => {
   return (
-    <Container hasOnClick={!!onClick} onClick={onClick}>
+    <Container hasOnClick={!!onClickDetail} onClick={onClickDetail}>
       <Header>
         <NameSection>
           <Name>{name}</Name>
