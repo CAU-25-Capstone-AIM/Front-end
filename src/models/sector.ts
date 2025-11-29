@@ -2,9 +2,9 @@ import type { StockRankingEntry } from './stock';
 
 export type SectorConsensusBreakdown = {
   strongBuy: number;
-  Buy: number;
+  moderateBuy: number;
   hold: number;
-  Sell: number;
+  moderateSell: number;
   strongSell: number;
 };
 

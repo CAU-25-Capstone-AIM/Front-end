@@ -12,9 +12,9 @@ export const mockSectorDetails: SectorDetail[] = [
     rank: 1,
     ratings: {
       strongBuy: 1,
-      Buy: 3,
+      moderateBuy: 3,
       hold: 1,
-      Sell: 0,
+      moderateSell: 0,
       strongSell: 0,
     },
     stocks: [
@@ -33,9 +33,9 @@ export const mockSectorDetails: SectorDetail[] = [
     rank: 2,
     ratings: {
       strongBuy: 1,
-      Buy: 2,
+      moderateBuy: 2,
       hold: 1,
-      Sell: 0,
+      moderateSell: 0,
       strongSell: 0,
     },
     stocks: [
@@ -53,9 +53,9 @@ export const mockSectorDetails: SectorDetail[] = [
     rank: 3,
     ratings: {
       strongBuy: 1,
-      Buy: 2,
+      moderateBuy: 2,
       hold: 2,
-      Sell: 0,
+      moderateSell: 0,
       strongSell: 0,
     },
     stocks: [
