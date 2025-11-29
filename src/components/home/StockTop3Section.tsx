@@ -7,9 +7,10 @@ export type StockRankingEntry = (typeof mockStockRankings)[number];
 
 export type StockTop3SectionProps = {
   stocks: StockRankingEntry[];
+  onClickStockDetail?: (ticker: string) => void;
 };
 
-export const StockTop3Section: React.FC<StockTop3SectionProps> = ({ stocks }) => {
+export const StockTop3Section: React.FC<StockTop3SectionProps> = ({ stocks, onClickStockDetail }) => {
   return (
     <SectionWrapper>
       <SectionHeader>
@@ -38,8 +39,9 @@ export const StockTop3Section: React.FC<StockTop3SectionProps> = ({ stocks }) =>
             upside={stock.upside}
             buyRatio={stock.buyRatio}
             onClickDetail={() => {
-              // eslint-disable-next-line no-console
-              console.log('Go to stock detail:', stock.ticker);
+              if (onClickStockDetail) {
+                onClickStockDetail(stock.ticker);
+              }
             }}
           />
         ))}

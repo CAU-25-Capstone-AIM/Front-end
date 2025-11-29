@@ -7,9 +7,13 @@ export type AnalystRankingEntry = (typeof mockAnalystRankings)[number];
 
 export type AnalystTop3SectionProps = {
   analysts: AnalystRankingEntry[];
+  onClickAnalystDetail?: (analystId: string) => void;
 };
 
-export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({ analysts }) => {
+export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({
+  analysts,
+  onClickAnalystDetail,
+}) => {
   return (
     <SectionWrapper>
       <SectionHeader>
@@ -38,8 +42,9 @@ export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({ analysts
             avgReturn={analyst.metrics.avgReturn}
             compositeScore={analyst.metrics.compositeScore}
             onClickDetail={() => {
-              // eslint-disable-next-line no-console
-              console.log('Go to analyst detail:', analyst.id);
+              if (onClickAnalystDetail) {
+                onClickAnalystDetail(analyst.id);
+              }
             }}
           />
         ))}

@@ -7,9 +7,13 @@ export type SectorRankingEntry = (typeof mockSectorRankings)[number];
 
 export type SectorTop3SectionProps = {
   sectors: SectorRankingEntry[];
+  onClickSectorDetail?: (sectorId: string) => void;
 };
 
-export const SectorTop3Section: React.FC<SectorTop3SectionProps> = ({ sectors }) => {
+export const SectorTop3Section: React.FC<SectorTop3SectionProps> = ({
+  sectors,
+  onClickSectorDetail,
+}) => {
   return (
     <SectionWrapper>
       <SectionHeader>
@@ -33,8 +37,9 @@ export const SectorTop3Section: React.FC<SectorTop3SectionProps> = ({ sectors })
             name={sector.name}
             buyRatio={sector.buyRatio}
             onClickDetail={() => {
-              // eslint-disable-next-line no-console
-              console.log('Go to sector detail:', sector.id);
+              if (onClickSectorDetail) {
+                onClickSectorDetail(sector.id);
+              }
             }}
           />
         ))}
