@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { StockRankingCard } from '../components/stock/StockRankingCard';
 import { Pagination } from '../components/common/Pagination';
-import { mockStockRankings } from '../mocks/stockRankings';
+import { getStockRankings } from '../api/stockApi';
+import type { StockRankingEntry } from '../models/stock';
 
 type StockSortType = 'upsideHigh' | 'upsideLow' | 'buyHigh' | 'buyLow';
 
@@ -13,9 +14,47 @@ export const StockRankingPage = () => {
   const navigate = useNavigate();
   const [sortType, setSortType] = useState<StockSortType>('upsideHigh');
   const [currentPage, setCurrentPage] = useState(1);
+  const [stocks, setStocks] = useState<StockRankingEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchStocks = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getStockRankings();
+        if (isMounted) {
+          setStocks(data);
+        }
+      } catch (e) {
+        console.error(e);
+        if (isMounted) {
+          setError('종목 랭킹을 불러오는 데 실패했습니다.');
+          setStocks([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchStocks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const { currentPageStocks, totalPages, startIndex } = useMemo(() => {
-    const sortedStocks = [...mockStockRankings].sort((a, b) => {
+    if (stocks.length === 0) {
+      return { currentPageStocks: [], totalPages: 0, startIndex: 0 };
+    }
+
+    const sortedStocks = [...stocks].sort((a, b) => {
       switch (sortType) {
         case 'upsideHigh':
           return b.upside - a.upside;
@@ -39,7 +78,7 @@ export const StockRankingPage = () => {
       totalPages: total,
       startIndex: start,
     };
-  }, [currentPage, sortType]);
+  }, [currentPage, sortType, stocks]);
 
   const handleSortChange = (nextSort: StockSortType) => {
     setSortType(nextSort);
@@ -88,21 +127,38 @@ export const StockRankingPage = () => {
 
       <RankingSection>
         <SectionTitle>종목 랭킹</SectionTitle>
-        <CardList>
-          {currentPageStocks.map((stock, index) => (
-            <StockRankingCard
-              key={stock.ticker}
-              name={stock.name}
-              ticker={stock.ticker}
-              sector={stock.sector}
-              upside={stock.upside}
-              buyRatio={stock.buyRatio}
-              rank={startIndex + index + 1}
-              onClickDetail={() => navigate(`/stocks/${stock.ticker}`)}
-            />
-          ))}
-        </CardList>
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        {loading && (
+          <StatusMessage>종목 랭킹을 불러오는 중입니다...</StatusMessage>
+        )}
+        {!loading && error && <StatusMessage>{error}</StatusMessage>}
+        {!loading && !error && currentPageStocks.length === 0 && (
+          <StatusMessage>표시할 랭킹 데이터가 없습니다.</StatusMessage>
+        )}
+        {!loading && !error && currentPageStocks.length > 0 && (
+          <>
+            <CardList>
+              {currentPageStocks.map((stock, index) => (
+                <StockRankingCard
+                  key={stock.ticker}
+                  name={stock.name}
+                  ticker={stock.ticker}
+                  sector={stock.sector}
+                  upside={stock.upside}
+                  buyRatio={stock.buyRatio}
+                  rank={startIndex + index + 1}
+                  onClickDetail={() => navigate(`/stocks/${stock.ticker}`)}
+                />
+              ))}
+            </CardList>
+            {totalPages > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
+        )}
       </RankingSection>
     </PageContainer>
   );
@@ -181,5 +237,14 @@ const CardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`;
+
+const StatusMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #666;
+  border: 1px dashed #d0d7de;
+  border-radius: 8px;
+  background-color: #fafbfc;
 `;
 

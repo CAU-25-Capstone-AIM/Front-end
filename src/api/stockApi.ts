@@ -3,11 +3,11 @@ import type { StockRankingEntry } from '../models/stock';
 
 export type StockRankingDTO = {
   id: number;
-  stockName: string;
-  stockCode: string;
+  stock_name: string;
+  stock_code: string;
   sector: string;
-  upsidePotential: number;
-  buyRatio: number;
+  upside_potential: number;
+  buy_ratio: number;
 };
 
 type StockRankingEntryWithId = StockRankingEntry & { id: string };
@@ -29,11 +29,11 @@ export async function getStockRankings(): Promise<StockRankingEntry[]> {
 
   const mapped: StockRankingEntryWithId[] = data.map((dto) => ({
     id: String(dto.id),
-    name: dto.stockName,
-    ticker: dto.stockCode,
+    name: dto.stock_name,
+    ticker: dto.stock_code,
     sector: dto.sector,
-    upside: dto.upsidePotential ?? 0,
-    buyRatio: dto.buyRatio ?? 0,
+    upside: dto.upside_potential ?? 0,
+    buyRatio: dto.buy_ratio ?? 0,
   }));
 
   console.log('[getStockRankings] mapped length:', mapped.length);
