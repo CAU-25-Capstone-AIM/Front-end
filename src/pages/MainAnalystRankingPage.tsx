@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnalystCard } from '../components/analyst/AnalystCard';
 import { Pagination } from '../components/common/Pagination';
-import { mockAnalystRankings } from '../mocks/analystRankings';
+import { getAnalystRankings, type AnalystSortKey } from '../api/analystApi';
+import type { AnalystRankingEntry } from '../models/analyst';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -73,6 +74,15 @@ const SectionTitle = styled.h2`
   color: #333;
 `;
 
+const StatusMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #666;
+  border: 1px dashed #d0d7de;
+  border-radius: 8px;
+  background-color: #fafbfc;
+`;
+
 type SortType = 'accuracy' | 'return' | 'error' | 'score';
 
 const PAGE_SIZE = 10;
@@ -81,37 +91,64 @@ export const MainAnalystRankingPage = () => {
   const navigate = useNavigate();
   const [sortType, setSortType] = useState<SortType>('accuracy');
   const [currentPage, setCurrentPage] = useState(1);
+  const [analysts, setAnalysts] = useState<AnalystRankingEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 정렬된 배열 생성
-  const sortedAnalysts = [...mockAnalystRankings]
-    .sort((a, b) => {
-      if (sortType === 'accuracy') {
-        // metrics.accuracy 내림차순 (높은 순)
-        return b.metrics.accuracy - a.metrics.accuracy;
-      } else if (sortType === 'return') {
-        // metrics.avgReturn 내림차순 (높은 순)
-        return b.metrics.avgReturn - a.metrics.avgReturn;
-      } else if (sortType === 'score') {
-        // compositeScore 내림차순 (높은 순)
-        return b.metrics.compositeScore - a.metrics.compositeScore;
-      } else {
-        // metrics.targetError 오름차순 (낮은 순일수록 좋은 순)
-        return a.metrics.targetError - b.metrics.targetError;
+  const mapSortTypeToKey = (sort: SortType): AnalystSortKey => {
+    switch (sort) {
+      case 'return':
+        return 'returnRate';
+      case 'error':
+        return 'targetDiffRate';
+      case 'score':
+        return 'aimsScore';
+      case 'accuracy':
+      default:
+        return 'accuracyRate';
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const sortKey = mapSortTypeToKey(sortType);
+        const data = await getAnalystRankings(sortKey);
+
+        if (isMounted) {
+          setAnalysts(data);
+        }
+      } catch (e) {
+        console.error(e);
+        if (isMounted) {
+          setError('애널리스트 랭킹을 불러오는 데 실패했습니다.');
+          setAnalysts([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    })
-    .map((analyst, index) => ({
-      ...analyst,
-      rank: index + 1, // 정렬 후 새로운 순위 할당
-    }));
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [sortType]);
 
   // 페이지네이션 계산
-  const totalPages = Math.ceil(sortedAnalysts.length / PAGE_SIZE);
+  const totalPages =
+    analysts.length > 0 ? Math.ceil(analysts.length / PAGE_SIZE) : 0;
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const currentPageAnalysts = sortedAnalysts.slice(startIndex, endIndex).map((analyst, index) => ({
-    ...analyst,
-    rank: startIndex + index + 1, // 전체 순위 기준으로 rank 업데이트
-  }));
+  const currentPageAnalysts = analysts.slice(startIndex, endIndex);
 
   return (
     <PageContainer>
@@ -163,25 +200,36 @@ export const MainAnalystRankingPage = () => {
 
       <RankingSection>
         <SectionTitle>애널리스트 랭킹</SectionTitle>
-        {currentPageAnalysts.map((analyst) => (
-          <AnalystCard
-            key={analyst.id}
-            name={analyst.name}
-            firm={analyst.firm}
-            rank={analyst.rank}
-            sectors={analyst.sectors}
-            accuracy={analyst.metrics.accuracy}
-            avgReturn={analyst.metrics.avgReturn}
-            targetError={analyst.metrics.targetError}
-            compositeScore={analyst.metrics.compositeScore}
-            onClickDetail={() => navigate(`/analysts/${analyst.id}`)}
+        {loading && (
+          <StatusMessage>애널리스트 랭킹을 불러오는 중입니다...</StatusMessage>
+        )}
+        {!loading && error && <StatusMessage>{error}</StatusMessage>}
+        {!loading && !error && currentPageAnalysts.length === 0 && (
+          <StatusMessage>표시할 랭킹 데이터가 없습니다.</StatusMessage>
+        )}
+        {!loading &&
+          !error &&
+          currentPageAnalysts.map((analyst) => (
+            <AnalystCard
+              key={analyst.id}
+              name={analyst.name}
+              firm={analyst.firm}
+              rank={analyst.rank}
+              sectors={analyst.sectors}
+              accuracy={analyst.metrics.accuracy}
+              avgReturn={analyst.metrics.avgReturn}
+              targetError={analyst.metrics.targetError}
+              compositeScore={analyst.metrics.compositeScore}
+              onClickDetail={() => navigate(`/analysts/${analyst.id}`)}
+            />
+          ))}
+        {!loading && !error && totalPages > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
-        ))}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        )}
       </RankingSection>
     </PageContainer>
   );
