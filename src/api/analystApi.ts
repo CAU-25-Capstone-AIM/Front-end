@@ -1,5 +1,6 @@
 import { httpClient } from './httpClient';
-import type { AnalystRankingEntry } from '../models/analyst';
+import { mapAnalystDetailFromDTO } from '../models/analyst';
+import type { AnalystDetail, AnalystRankingEntry } from '../models/analyst';
 
 export type AnalystMetricsDTO = {
   analyst_id: number;
@@ -23,6 +24,36 @@ export type AnalystSortKey =
   | 'returnRate'
   | 'targetDiffRate'
   | 'aimsScore';
+
+export type AnalystDetailDTO = {
+  analyst_id: number;
+  analyst_name: string;
+  firm_name: string;
+  accuracy_rate: number;
+  return_rate: number;
+  target_diff_rate: number;
+  avg_return_diff: number;
+  avg_target_diff: number;
+  aims_score: number;
+  covered_stocks: {
+    stock_id: number;
+    stock_name: string;
+    stock_code: string;
+    sector: string;
+    report_count: number;
+  }[];
+  reports: {
+    report_id: number;
+    report_title: string;
+    report_date: string;
+    stock_name: string;
+    stock_code: string;
+    target_price: number;
+    surface_opinion: string;
+    hidden_opinion: number;
+    hidden_opinion_label: string;
+  }[];
+};
 
 const fallbackNumber = (value: unknown, digits = 1): number => {
   if (typeof value !== 'number' || Number.isNaN(value)) {
@@ -60,5 +91,13 @@ export async function getAnalystRankings(
 
   console.log('[getAnalystRankings] mapped length:', mapped.length);
   return mapped;
+}
+
+export async function getAnalystDetail(
+  analystId: number,
+): Promise<AnalystDetail> {
+  const response =
+    await httpClient.get<AnalystDetailDTO>(`/analysts/${analystId}`);
+  return mapAnalystDetailFromDTO(response.data);
 }
 
