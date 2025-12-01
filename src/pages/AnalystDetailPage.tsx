@@ -4,6 +4,15 @@ import styled from 'styled-components';
 import { MetricCard } from '../components/analyst/MetricCard';
 import { getAnalystDetail } from '../api/analystApi';
 import type { AnalystDetail } from '../models/analyst';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -77,7 +86,7 @@ const SectorTag = styled.span`
 
 const MetricsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin-top: 16px;
 `;
@@ -131,6 +140,12 @@ const ChartPlaceholder = styled.div`
   margin-top: 16px;
 `;
 
+const ChartWrapper = styled.div`
+  width: 100%;
+  height: 300px;
+  margin-top: 16px;
+`;
+
 const ReportList = styled.div`
   display: flex;
   flex-direction: column;
@@ -180,6 +195,46 @@ const ReportButton = styled.button`
     background-color: #0056b3;
   }
 `;
+
+type ReportFrequencyPoint = {
+  month: string;
+  count: number;
+};
+
+const buildReportFrequencyLastYear = (
+  reports: AnalystDetail['reports'],
+): ReportFrequencyPoint[] => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
+  const counter = new Map<string, number>();
+  reports.forEach((report) => {
+    const date = new Date(report.date);
+    if (Number.isNaN(date.getTime())) {
+      return;
+    }
+    if (date < start || date > now) {
+      return;
+    }
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      '0',
+    )}`;
+    counter.set(key, (counter.get(key) ?? 0) + 1);
+  });
+
+  const points: ReportFrequencyPoint[] = [];
+  for (let i = 0; i < 12; i += 1) {
+    const current = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    const key = `${current.getFullYear()}-${String(
+      current.getMonth() + 1,
+    ).padStart(2, '0')}`;
+    points.push({ month: key, count: counter.get(key) ?? 0 });
+  }
+
+  return points;
+};
 
 export const AnalystDetailPage = () => {
   const { analystId } = useParams<{ analystId: string }>();
@@ -261,6 +316,8 @@ export const AnalystDetailPage = () => {
   const formatPercent = (value: number, digits = 1) =>
     `${value.toFixed(digits)}%`;
 
+  const reportFrequency = buildReportFrequencyLastYear(analyst.reports);
+
   return (
     <PageContainer>
       <Section>
@@ -300,6 +357,10 @@ export const AnalystDetailPage = () => {
             label="평균 대비 목표가 정확도"
             value={formatPercent(analyst.metrics.avgTargetDiff)}
           />
+          <MetricCard
+            label="AIM's Score"
+            value={analyst.metrics.aimsScore.toFixed(0)}
+          />
         </MetricsGrid>
       </Section>
 
@@ -329,9 +390,23 @@ export const AnalystDetailPage = () => {
 
       <Section>
         <SectionTitle>최근 1년 리포트 발행 추이</SectionTitle>
-        <ChartPlaceholder>
-          리포트 발행 추이 차트 (Recharts로 교체 예정)
-        </ChartPlaceholder>
+        {reportFrequency.length === 0 || reportFrequency.every((p) => p.count === 0) ? (
+          <ChartPlaceholder>
+            최근 1년간 발행된 리포트가 없습니다.
+          </ChartPlaceholder>
+        ) : (
+          <ChartWrapper>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={reportFrequency}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
+        )}
       </Section>
 
       <Section>
