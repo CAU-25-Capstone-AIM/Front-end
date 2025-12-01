@@ -28,7 +28,7 @@ function App() {
           <Route path="/analysts" element={<MainAnalystRankingPage />} />
           <Route path="/analysts/:analystId" element={<AnalystDetailPage />} />
           <Route path="/stocks" element={<StockRankingPage />} />
-          <Route path="/stocks/:ticker" element={<StockDetailPage />} />
+          <Route path="/stocks/:stockId" element={<StockDetailPage />} />
           <Route path="/sectors" element={<SectorRankingPage />} />
           <Route path="/sectors/:sectorId" element={<SectorDetailPage />} />
         </Routes>

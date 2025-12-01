@@ -27,3 +27,25 @@ export type StockDetail = {
   close_price_trend: StockClosePricePoint[];
 };
 
+export type ClosePricePoint = StockClosePricePoint;
+
+export type DailyAverageTargetPricePoint = {
+  trade_date: string;
+  average_target_price: number;
+};
+
+export type LatestTargetPriceSummary = {
+  average_target_price: number;
+  max_target_price: number;
+  min_target_price: number;
+};
+
+export type PriceForecastChartPoint = {
+  date: string;
+  close?: number;
+  avgTargetHist?: number;
+  forecastHigh?: number;
+  forecastAvg?: number;
+  forecastLow?: number;
+};
+
