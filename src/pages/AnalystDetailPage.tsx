@@ -1,5 +1,9 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { MetricCard } from '../components/analyst/MetricCard';
+import { getAnalystDetail } from '../api/analystApi';
+import type { AnalystDetail } from '../models/analyst';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -8,6 +12,17 @@ const PageContainer = styled.div`
   gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
+`;
+
+const StatusMessage = styled.p`
+  margin: 0;
+  padding: 80px 24px;
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 `;
 
 const Section = styled.section`
@@ -167,75 +182,123 @@ const ReportButton = styled.button`
 `;
 
 export const AnalystDetailPage = () => {
-  // Mock 데이터
-  const analyst = {
-    name: '김애널리스트',
-    affiliation: '삼성증권',
-    sectors: ['IT/전자', '반도체', '디스플레이'],
-    metrics: {
-      accuracy: '85.5%',
-      avgReturn: '12.3%',
-      targetPriceError: '5.2%',
-      avgReturnVsMarket: '+3.5%',
-      accuracyVsMarket: '+8.2%',
-    },
-    coveredStocks: [
-      { name: '삼성전자', ticker: '005930', sector: 'IT/전자' },
-      { name: 'SK하이닉스', ticker: '000660', sector: '반도체' },
-      { name: 'LG디스플레이', ticker: '034220', sector: '디스플레이' },
-    ],
-    reports: [
-      {
-        id: 1,
-        title: '삼성전자, 반도체 회복세 지속 전망',
-        date: '2024-01-15',
-        stock: '삼성전자',
-      },
-      {
-        id: 2,
-        title: 'SK하이닉스, HBM 수요 증가로 실적 개선 기대',
-        date: '2024-01-10',
-        stock: 'SK하이닉스',
-      },
-      {
-        id: 3,
-        title: 'LG디스플레이, OLED 시장 성장세 지속',
-        date: '2024-01-05',
-        stock: 'LG디스플레이',
-      },
-    ],
-  };
+  const { analystId } = useParams<{ analystId: string }>();
+  const [analyst, setAnalyst] = useState<AnalystDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!analystId) {
+      setError('애널리스트 ID가 유효하지 않습니다.');
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchDetail = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const numericId = Number(analystId);
+        if (Number.isNaN(numericId)) {
+          throw new Error('Invalid analystId');
+        }
+
+        const data = await getAnalystDetail(numericId);
+        if (isMounted) {
+          setAnalyst(data);
+        }
+      } catch (e) {
+        console.error(e);
+        if (isMounted) {
+          setError('애널리스트 상세 정보를 불러오는 데 실패했습니다.');
+          setAnalyst(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchDetail();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [analystId]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <StatusMessage>애널리스트 상세 정보를 불러오는 중입니다...</StatusMessage>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <StatusMessage>{error}</StatusMessage>
+      </PageContainer>
+    );
+  }
+
+  if (!analyst) {
+    return (
+      <PageContainer>
+        <StatusMessage>애널리스트 정보를 찾을 수 없습니다.</StatusMessage>
+      </PageContainer>
+    );
+  }
+
+  const uniqueSectors = Array.from(
+    new Set(analyst.coveredStocks.map((stock) => stock.sector)),
+  );
+
+  const formatPercent = (value: number, digits = 1) =>
+    `${value.toFixed(digits)}%`;
 
   return (
     <PageContainer>
       <Section>
         <HeaderWrapper>
           <AnalystName>{analyst.name}</AnalystName>
-          <Affiliation>{analyst.affiliation}</Affiliation>
-          <SectorList>
-            {analyst.sectors.map((sector, index) => (
-              <SectorTag key={index}>{sector}</SectorTag>
-            ))}
-          </SectorList>
+          <Affiliation>{analyst.firm}</Affiliation>
+          {uniqueSectors.length > 0 && (
+            <SectorList>
+              {uniqueSectors.map((sector) => (
+                <SectorTag key={sector}>{sector}</SectorTag>
+              ))}
+            </SectorList>
+          )}
         </HeaderWrapper>
       </Section>
 
       <Section>
         <SectionTitle>핵심 지표</SectionTitle>
         <MetricsGrid>
-          <MetricCard label="정답률" value={analyst.metrics.accuracy} />
-          <MetricCard label="평균 수익률" value={analyst.metrics.avgReturn} />
+          <MetricCard
+            label="정답률"
+            value={formatPercent(analyst.metrics.accuracyRate)}
+          />
+          <MetricCard
+            label="평균 수익률"
+            value={formatPercent(analyst.metrics.returnRate)}
+          />
           <MetricCard
             label="목표가 오차율"
-            value={analyst.metrics.targetPriceError}
+            value={formatPercent(analyst.metrics.targetDiffRate)}
           />
           <MetricCard
             label="평균 대비 수익률"
-            value={analyst.metrics.avgReturnVsMarket}
+            value={formatPercent(analyst.metrics.avgReturnDiff)}
           />
           <MetricCard
             label="평균 대비 목표가 정확도"
-            value={analyst.metrics.accuracyVsMarket}
+            value={formatPercent(analyst.metrics.avgTargetDiff)}
           />
         </MetricsGrid>
       </Section>
@@ -246,16 +309,18 @@ export const AnalystDetailPage = () => {
           <TableHeader>
             <tr>
               <TableHeaderCell>종목명</TableHeaderCell>
-              <TableHeaderCell>티커</TableHeaderCell>
+              <TableHeaderCell>종목 코드</TableHeaderCell>
               <TableHeaderCell>섹터</TableHeaderCell>
+              <TableHeaderCell>리포트 수</TableHeaderCell>
             </tr>
           </TableHeader>
           <TableBody>
-            {analyst.coveredStocks.map((stock, index) => (
-              <TableRow key={index}>
+            {analyst.coveredStocks.map((stock) => (
+              <TableRow key={stock.id}>
                 <TableCell>{stock.name}</TableCell>
-                <TableCell>{stock.ticker}</TableCell>
+                <TableCell>{stock.code}</TableCell>
                 <TableCell>{stock.sector}</TableCell>
+                <TableCell>{stock.reportCount}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -271,19 +336,24 @@ export const AnalystDetailPage = () => {
 
       <Section>
         <SectionTitle>리포트 목록</SectionTitle>
-        <ReportList>
-          {analyst.reports.map((report) => (
-            <ReportItem key={report.id}>
-              <ReportInfo>
-                <ReportTitle>{report.title}</ReportTitle>
-                <ReportMeta>
-                  {report.date} · {report.stock}
-                </ReportMeta>
-              </ReportInfo>
-              <ReportButton>리포트 보기</ReportButton>
-            </ReportItem>
-          ))}
-        </ReportList>
+        {analyst.reports.length === 0 ? (
+          <StatusMessage>등록된 리포트가 없습니다.</StatusMessage>
+        ) : (
+          <ReportList>
+            {analyst.reports.map((report) => (
+              <ReportItem key={report.id}>
+                <ReportInfo>
+                  <ReportTitle>{report.title}</ReportTitle>
+                  <ReportMeta>
+                    {report.date} · {report.stockName} ({report.stockCode}) ·{' '}
+                    {report.surfaceOpinion} / {report.hiddenOpinionLabel}
+                  </ReportMeta>
+                </ReportInfo>
+                <ReportButton>리포트 보기</ReportButton>
+              </ReportItem>
+            ))}
+          </ReportList>
+        )}
       </Section>
     </PageContainer>
   );
