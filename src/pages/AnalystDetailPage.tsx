@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { MetricCard } from '../components/analyst/MetricCard';
 import { getAnalystDetail } from '../api/analystApi';
@@ -196,6 +196,28 @@ const ReportButton = styled.button`
   }
 `;
 
+const StockNameLink = styled.span`
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: #1d4ed8;
+  }
+`;
+
+const SectorLink = styled.span`
+  color: #059669;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: #047857;
+  }
+`;
+
 type ReportFrequencyPoint = {
   month: string;
   count: number;
@@ -238,6 +260,7 @@ const buildReportFrequencyLastYear = (
 
 export const AnalystDetailPage = () => {
   const { analystId } = useParams<{ analystId: string }>();
+  const navigate = useNavigate();
   const [analyst, setAnalyst] = useState<AnalystDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -378,9 +401,23 @@ export const AnalystDetailPage = () => {
           <TableBody>
             {analyst.coveredStocks.map((stock) => (
               <TableRow key={stock.id}>
-                <TableCell>{stock.name}</TableCell>
+                <TableCell>
+                  <StockNameLink
+                    onClick={() => navigate(`/stocks/${stock.code}`)}
+                  >
+                    {stock.name}
+                  </StockNameLink>
+                </TableCell>
                 <TableCell>{stock.code}</TableCell>
-                <TableCell>{stock.sector}</TableCell>
+                <TableCell>
+                  <SectorLink
+                    onClick={() =>
+                      navigate(`/sectors/${encodeURIComponent(stock.sector)}`)
+                    }
+                  >
+                    {stock.sector}
+                  </SectorLink>
+                </TableCell>
                 <TableCell>{stock.reportCount}</TableCell>
               </TableRow>
             ))}
