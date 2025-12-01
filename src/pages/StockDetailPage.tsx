@@ -116,6 +116,14 @@ const AnalystList = styled.div`
 const formatCurrency = (value: number) =>
   `${value.toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
 
+const formatOpinionPercent = (count: number, total: number) => {
+  if (!total) {
+    return '-';
+  }
+  const ratio = (count / total) * 100;
+  return `${ratio.toFixed(1)}%`;
+};
+
 export const StockDetailPage = () => {
   const { stockId } = useParams<{ stockId: string }>();
   const numericStockId = Number(stockId);
@@ -143,6 +151,10 @@ export const StockDetailPage = () => {
     consensus.max_target_price ?? consensus.average_target_price;
   const minTargetPrice =
     consensus.min_target_price ?? consensus.average_target_price;
+  const buyCount = consensus.buy_count ?? 0;
+  const holdCount = consensus.hold_count ?? 0;
+  const sellCount = consensus.sell_count ?? 0;
+  const totalOpinions = buyCount + holdCount + sellCount;
 
   const analysts = [
     {
@@ -182,15 +194,21 @@ export const StockDetailPage = () => {
         <OpinionSummary>
           <OpinionBox>
             <OpinionLabel>매수</OpinionLabel>
-            <OpinionValue>60%</OpinionValue>
+            <OpinionValue>
+              {formatOpinionPercent(buyCount, totalOpinions)}
+            </OpinionValue>
           </OpinionBox>
           <OpinionBox>
             <OpinionLabel>보유</OpinionLabel>
-            <OpinionValue>30%</OpinionValue>
+            <OpinionValue>
+              {formatOpinionPercent(holdCount, totalOpinions)}
+            </OpinionValue>
           </OpinionBox>
           <OpinionBox>
             <OpinionLabel>매도</OpinionLabel>
-            <OpinionValue>10%</OpinionValue>
+            <OpinionValue>
+              {formatOpinionPercent(sellCount, totalOpinions)}
+            </OpinionValue>
           </OpinionBox>
         </OpinionSummary>
       </Section>
