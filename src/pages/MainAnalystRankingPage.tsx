@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnalystCard } from '../components/analyst/AnalystCard';
 import { Pagination } from '../components/common/Pagination';
-import { getAnalystRankings, type AnalystSortKey } from '../api/analystApi';
+import { getAnalystRankings } from '../api/analystApi';
 import type { AnalystRankingEntry } from '../models/analyst';
+import { useAnalystSort } from '../hooks/useAnalystSort';
+import { AnalystSortControl } from '../components/analyst/AnalystSortControl';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -40,25 +42,6 @@ const SortBar = styled.section`
   background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
-  display: flex;
-  gap: 12px;
-`;
-
-const SortButton = styled.button<{ active: boolean }>`
-  padding: 8px 16px;
-  border: 1px solid ${(props) => (props.active ? '#007bff' : '#e0e0e0')};
-  border-radius: 4px;
-  background-color: ${(props) => (props.active ? '#007bff' : '#ffffff')};
-  color: ${(props) => (props.active ? '#ffffff' : '#333')};
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: #007bff;
-    background-color: ${(props) => (props.active ? '#0056b3' : '#f0f8ff')};
-  }
 `;
 
 const RankingSection = styled.section`
@@ -83,31 +66,16 @@ const StatusMessage = styled.div`
   background-color: #fafbfc;
 `;
 
-type SortType = 'accuracy' | 'return' | 'error' | 'score';
-
 const PAGE_SIZE = 10;
 
 export const MainAnalystRankingPage = () => {
   const navigate = useNavigate();
-  const [sortType, setSortType] = useState<SortType>('accuracy');
   const [currentPage, setCurrentPage] = useState(1);
   const [analysts, setAnalysts] = useState<AnalystRankingEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const mapSortTypeToKey = (sort: SortType): AnalystSortKey => {
-    switch (sort) {
-      case 'return':
-        return 'returnRate';
-      case 'error':
-        return 'targetDiffRate';
-      case 'score':
-        return 'aimsScore';
-      case 'accuracy':
-      default:
-        return 'accuracyRate';
-    }
-  };
+  const { sortKey, direction, setSortKey, toggleDirection, sortAnalysts } =
+    useAnalystSort('accuracy', 'desc');
 
   useEffect(() => {
     let isMounted = true;
@@ -117,8 +85,7 @@ export const MainAnalystRankingPage = () => {
         setLoading(true);
         setError(null);
 
-        const sortKey = mapSortTypeToKey(sortType);
-        const data = await getAnalystRankings(sortKey);
+        const data = await getAnalystRankings('accuracyRate');
 
         if (isMounted) {
           setAnalysts(data);
@@ -141,14 +108,15 @@ export const MainAnalystRankingPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [sortType]);
+  }, []);
 
   // 페이지네이션 계산
+  const sortedAnalysts = sortAnalysts(analysts);
   const totalPages =
-    analysts.length > 0 ? Math.ceil(analysts.length / PAGE_SIZE) : 0;
+    sortedAnalysts.length > 0 ? Math.ceil(sortedAnalysts.length / PAGE_SIZE) : 0;
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const currentPageAnalysts = analysts.slice(startIndex, endIndex);
+  const currentPageAnalysts = sortedAnalysts.slice(startIndex, endIndex);
 
   return (
     <PageContainer>
@@ -160,42 +128,18 @@ export const MainAnalystRankingPage = () => {
       </HeaderSection>
 
       <SortBar>
-        <SortButton
-          active={sortType === 'accuracy'}
-          onClick={() => {
-            setSortType('accuracy');
+        <AnalystSortControl
+          sortKey={sortKey}
+          direction={direction}
+          onChangeKey={(key) => {
+            setSortKey(key);
             setCurrentPage(1);
           }}
-        >
-          정답률
-        </SortButton>
-        <SortButton
-          active={sortType === 'return'}
-          onClick={() => {
-            setSortType('return');
+          onToggleDirection={() => {
+            toggleDirection();
             setCurrentPage(1);
           }}
-        >
-          수익률
-        </SortButton>
-        <SortButton
-          active={sortType === 'error'}
-          onClick={() => {
-            setSortType('error');
-            setCurrentPage(1);
-          }}
-        >
-          오차율
-        </SortButton>
-        <SortButton
-          active={sortType === 'score'}
-          onClick={() => {
-            setSortType('score');
-            setCurrentPage(1);
-          }}
-        >
-          종합 점수
-        </SortButton>
+        />
       </SortBar>
 
       <RankingSection>

@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { StockHeader } from '../components/stock/StockHeader';
 import { AnalystCard } from '../components/analyst/AnalystCard';
 import { useStockDetail } from '../hooks/useStockDetail';
+import { useAnalystSort } from '../hooks/useAnalystSort';
+import { AnalystSortControl } from '../components/analyst/AnalystSortControl';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -106,11 +108,17 @@ const ChartPlaceholder = styled.div`
   margin-top: 16px;
 `;
 
+const AnalystListHeader = styled.div`
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
 const AnalystList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 16px;
 `;
 
 const formatCurrency = (value: number) =>
@@ -124,6 +132,19 @@ const formatOpinionPercent = (count: number, total: number) => {
   return `${ratio.toFixed(1)}%`;
 };
 
+type StockAnalyst = {
+  id: string;
+  name: string;
+  firm: string;
+  sectors: string[];
+  metrics: {
+    accuracy: number;
+    avgReturn: number;
+    targetError: number;
+    compositeScore: number;
+  };
+};
+
 export const StockDetailPage = () => {
   const { stockId } = useParams<{ stockId: string }>();
   const numericStockId = Number(stockId);
@@ -132,6 +153,13 @@ export const StockDetailPage = () => {
     isLoading,
     isError,
   } = useStockDetail(Number.isNaN(numericStockId) ? -1 : numericStockId);
+  const {
+    sortKey: analystSortKey,
+    direction: analystSortDirection,
+    setSortKey: setAnalystSortKey,
+    toggleDirection: toggleAnalystDirection,
+    sortAnalysts,
+  } = useAnalystSort('aimScore', 'desc');
 
   if (Number.isNaN(numericStockId)) {
     return <PageContainer>유효하지 않은 종목 ID입니다.</PageContainer>;
@@ -156,28 +184,34 @@ export const StockDetailPage = () => {
   const sellCount = consensus.sell_count ?? 0;
   const totalOpinions = buyCount + holdCount + sellCount;
 
-  const analysts = [
+  const coveringAnalysts: StockAnalyst[] = [
     {
-      id: 1,
+      id: '1',
       name: '김애널리스트',
       firm: '삼성증권',
       sectors: ['IT/전자', '반도체'],
-      accuracy: 85.5,
-      avgReturn: 12.3,
-      targetError: 5.2,
-      compositeScore: 92,
+      metrics: {
+        accuracy: 85.5,
+        avgReturn: 12.3,
+        targetError: 5.2,
+        compositeScore: 92,
+      },
     },
     {
-      id: 2,
+      id: '2',
       name: '이애널리스트',
       firm: 'KB증권',
       sectors: ['IT/전자', '디스플레이'],
-      accuracy: 82.1,
-      avgReturn: 10.8,
-      targetError: 6.5,
-      compositeScore: 88,
+      metrics: {
+        accuracy: 82.1,
+        avgReturn: 10.8,
+        targetError: 6.5,
+        compositeScore: 88,
+      },
     },
   ];
+
+  const sortedCoveringAnalysts = sortAnalysts(coveringAnalysts);
 
   return (
     <PageContainer>
@@ -249,17 +283,25 @@ export const StockDetailPage = () => {
 
       <Section>
         <SectionTitle>이 종목을 커버하는 애널리스트</SectionTitle>
+        <AnalystListHeader>
+          <AnalystSortControl
+            sortKey={analystSortKey}
+            direction={analystSortDirection}
+            onChangeKey={setAnalystSortKey}
+            onToggleDirection={toggleAnalystDirection}
+          />
+        </AnalystListHeader>
         <AnalystList>
-          {analysts.map((analyst) => (
+          {sortedCoveringAnalysts.map((analyst) => (
             <AnalystCard
               key={analyst.id}
               name={analyst.name}
               firm={analyst.firm}
               sectors={analyst.sectors}
-              accuracy={analyst.accuracy}
-              avgReturn={analyst.avgReturn}
-              targetError={analyst.targetError}
-              compositeScore={analyst.compositeScore}
+              accuracy={analyst.metrics.accuracy}
+              avgReturn={analyst.metrics.avgReturn}
+              targetError={analyst.metrics.targetError}
+              compositeScore={analyst.metrics.compositeScore}
             />
           ))}
         </AnalystList>
