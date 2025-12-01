@@ -54,14 +54,29 @@ export const SectorRankingCard: React.FC<SectorRankingCardProps> = ({
     },
   ];
 
+  const clickable = Boolean(onClickDetail);
+
+  const handleClick = () => {
+    onClickDetail?.();
+  };
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    if (!clickable) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClickDetail?.();
+    }
+  };
+
   return (
     <CardWrapper
-      $clickable={Boolean(onClickDetail)}
-      onClick={() => {
-        if (onClickDetail) {
-          onClickDetail();
-        }
-      }}
+      $clickable={clickable}
+      onClick={clickable ? handleClick : undefined}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? handleKeyDown : undefined}
     >
       <HeaderRow>
         <div>

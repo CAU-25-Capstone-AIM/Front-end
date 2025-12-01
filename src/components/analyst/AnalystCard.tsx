@@ -13,18 +13,18 @@ type AnalystCardProps = {
   onClickDetail?: () => void;
 };
 
-const Container = styled.div<{ hasOnClick: boolean }>`
+const Container = styled.div<{ $clickable: boolean }>`
   padding: 20px;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   margin-bottom: 16px;
-  cursor: ${(props) => (props.hasOnClick ? 'pointer' : 'default')};
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
   transition: box-shadow 0.2s;
 
   &:hover {
-    box-shadow: ${(props) =>
-      props.hasOnClick ? '0 4px 12px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(0, 0, 0, 0.08)'};
+    box-shadow: ${({ $clickable }) =>
+      $clickable ? '0 4px 12px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(0, 0, 0, 0.08)'};
   }
 `;
 
@@ -131,8 +131,26 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
   compositeScore,
   onClickDetail,
 }) => {
+  const clickable = Boolean(onClickDetail);
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    if (!clickable) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClickDetail?.();
+    }
+  };
+
   return (
-    <Container hasOnClick={!!onClickDetail} onClick={onClickDetail}>
+    <Container
+      $clickable={clickable}
+      onClick={clickable ? onClickDetail : undefined}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? handleKeyDown : undefined}
+    >
       <Header>
         <NameSection>
           <Name>{name}</Name>
