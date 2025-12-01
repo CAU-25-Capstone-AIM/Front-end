@@ -1,6 +1,8 @@
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 import { StockHeader } from '../components/stock/StockHeader';
 import { AnalystCard } from '../components/analyst/AnalystCard';
+import { useStockDetail } from '../hooks/useStockDetail';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -111,13 +113,36 @@ const AnalystList = styled.div`
   margin-top: 16px;
 `;
 
+const formatCurrency = (value: number) =>
+  `${value.toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+
 export const StockDetailPage = () => {
-  // Mock 데이터
-  const stock = {
-    name: '삼성전자',
-    ticker: '005930',
-    sector: 'IT/전자',
-  };
+  const { stockId } = useParams<{ stockId: string }>();
+  const numericStockId = Number(stockId);
+  const {
+    data: stock,
+    isLoading,
+    isError,
+  } = useStockDetail(Number.isNaN(numericStockId) ? -1 : numericStockId);
+
+  if (Number.isNaN(numericStockId)) {
+    return <PageContainer>유효하지 않은 종목 ID입니다.</PageContainer>;
+  }
+
+  if (isLoading) {
+    return <PageContainer>종목 정보를 불러오는 중입니다...</PageContainer>;
+  }
+
+  if (isError || !stock) {
+    return <PageContainer>종목 정보를 불러오지 못했습니다.</PageContainer>;
+  }
+
+  const consensus = stock.consensus;
+  const averageTargetPrice = consensus.average_target_price;
+  const maxTargetPrice =
+    consensus.max_target_price ?? consensus.average_target_price;
+  const minTargetPrice =
+    consensus.min_target_price ?? consensus.average_target_price;
 
   const analysts = [
     {
@@ -146,8 +171,8 @@ export const StockDetailPage = () => {
     <PageContainer>
       <Section>
         <StockHeader
-          name={stock.name}
-          ticker={stock.ticker}
+          name={stock.stock_name}
+          ticker={stock.stock_code}
           sector={stock.sector}
         />
       </Section>
@@ -175,19 +200,27 @@ export const StockDetailPage = () => {
         <TargetPriceGrid>
           <TargetPriceItem>
             <TargetPriceLabel>평균 목표가</TargetPriceLabel>
-            <TargetPriceValue>85,000원</TargetPriceValue>
+            <TargetPriceValue>
+              {formatCurrency(averageTargetPrice)}
+            </TargetPriceValue>
           </TargetPriceItem>
           <TargetPriceItem>
             <TargetPriceLabel>최고 목표가</TargetPriceLabel>
-            <TargetPriceValue>95,000원</TargetPriceValue>
+            <TargetPriceValue>
+              {formatCurrency(maxTargetPrice)}
+            </TargetPriceValue>
           </TargetPriceItem>
           <TargetPriceItem>
             <TargetPriceLabel>최저 목표가</TargetPriceLabel>
-            <TargetPriceValue>75,000원</TargetPriceValue>
+            <TargetPriceValue>
+              {formatCurrency(minTargetPrice)}
+            </TargetPriceValue>
           </TargetPriceItem>
         </TargetPriceGrid>
         <UpsidePotential>
-          <UpsideText>상승 여력: +15.2%</UpsideText>
+          <UpsideText>
+            상승 여력: {consensus.upside_potential.toFixed(2)}%
+          </UpsideText>
         </UpsidePotential>
       </Section>
 
