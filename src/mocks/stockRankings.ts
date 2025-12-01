@@ -2,6 +2,7 @@ import type { StockRankingEntry } from '../models/stock';
 
 export const mockStockRankings: StockRankingEntry[] = [
   {
+    id: 1,
     ticker: '005930',
     name: '삼성전자',
     sector: 'IT 하드웨어',
@@ -9,6 +10,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 72.5,
   },
   {
+    id: 2,
     ticker: '000660',
     name: 'SK하이닉스',
     sector: '반도체',
@@ -16,6 +18,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 68.4,
   },
   {
+    id: 3,
     ticker: '035420',
     name: 'NAVER',
     sector: '인터넷 서비스',
@@ -23,6 +26,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 64.2,
   },
   {
+    id: 4,
     ticker: '005380',
     name: '현대차',
     sector: '자동차',
@@ -30,6 +34,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 59.7,
   },
   {
+    id: 5,
     ticker: '051910',
     name: 'LG화학',
     sector: '2차전지',
@@ -37,6 +42,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 66.3,
   },
   {
+    id: 6,
     ticker: '207940',
     name: '삼성바이오로직스',
     sector: '바이오',
@@ -44,6 +50,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 58.1,
   },
   {
+    id: 7,
     ticker: '006400',
     name: '삼성SDI',
     sector: '2차전지',
@@ -51,6 +58,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 63.5,
   },
   {
+    id: 8,
     ticker: '035720',
     name: '카카오',
     sector: '인터넷 서비스',
@@ -58,6 +66,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 61.2,
   },
   {
+    id: 9,
     ticker: '068270',
     name: '셀트리온',
     sector: '바이오',
@@ -65,6 +74,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 57.3,
   },
   {
+    id: 10,
     ticker: '003670',
     name: '포스코퓨처엠',
     sector: '소재',
@@ -72,6 +82,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 60.8,
   },
   {
+    id: 11,
     ticker: '105560',
     name: 'KB금융',
     sector: '금융',
@@ -79,6 +90,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 54.6,
   },
   {
+    id: 12,
     ticker: '086790',
     name: '하나금융지주',
     sector: '금융',
@@ -86,6 +98,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 52.4,
   },
   {
+    id: 13,
     ticker: '011170',
     name: '롯데케미칼',
     sector: '화학',
@@ -93,6 +106,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 55.1,
   },
   {
+    id: 14,
     ticker: '096770',
     name: 'SK이노베이션',
     sector: '에너지',
@@ -100,6 +114,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 50.3,
   },
   {
+    id: 15,
     ticker: '028260',
     name: '삼성물산',
     sector: '지주',
@@ -107,6 +122,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 48.9,
   },
   {
+    id: 16,
     ticker: '066570',
     name: 'LG전자',
     sector: '가전',
@@ -114,6 +130,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 51.7,
   },
   {
+    id: 17,
     ticker: '302440',
     name: 'SK바이오사이언스',
     sector: '바이오',
@@ -121,6 +138,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 62.8,
   },
   {
+    id: 18,
     ticker: '377300',
     name: '카카오페이',
     sector: '핀테크',
@@ -128,6 +146,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 65.9,
   },
   {
+    id: 19,
     ticker: '323410',
     name: '카카오뱅크',
     sector: '핀테크',
@@ -135,6 +154,7 @@ export const mockStockRankings: StockRankingEntry[] = [
     buyRatio: 67.1,
   },
   {
+    id: 20,
     ticker: '000270',
     name: '기아',
     sector: '자동차',

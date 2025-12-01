@@ -49,7 +49,7 @@ export const SectorStockListSection: React.FC<SectorStockListSectionProps> = ({ 
       <CardList>
         {sortedStocks.map((stock, index) => (
           <StockRankingCard
-            key={stock.ticker}
+            key={stock.id}
             name={stock.name}
             ticker={stock.ticker}
             sector={stock.sector}

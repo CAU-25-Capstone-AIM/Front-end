@@ -139,14 +139,14 @@ export const StockRankingPage = () => {
             <CardList>
               {currentPageStocks.map((stock, index) => (
                 <StockRankingCard
-                  key={stock.ticker}
+                  key={stock.id}
                   name={stock.name}
                   ticker={stock.ticker}
                   sector={stock.sector}
                   upside={stock.upside}
                   buyRatio={stock.buyRatio}
                   rank={startIndex + index + 1}
-                  onClickDetail={() => navigate(`/stocks/${stock.ticker}`)}
+                  onClickDetail={() => navigate(`/stocks/${stock.id}`)}
                 />
               ))}
             </CardList>

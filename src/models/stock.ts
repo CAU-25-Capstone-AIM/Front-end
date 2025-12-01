@@ -40,6 +40,7 @@ export type StockDetailPageData = {
 
 // 종목 랭킹에 사용될 엔트리 타입
 export type StockRankingEntry = {
+  id: number;
   ticker: string;
   name: string;
   sector: string;

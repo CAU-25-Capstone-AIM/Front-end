@@ -10,8 +10,6 @@ export type StockRankingDTO = {
   buy_ratio: number;
 };
 
-type StockRankingEntryWithId = StockRankingEntry & { id: string };
-
 const isStockRankingDTOArray = (
   data: unknown,
 ): data is StockRankingDTO[] => Array.isArray(data);
@@ -27,8 +25,8 @@ export async function getStockRankings(): Promise<StockRankingEntry[]> {
 
   console.log('[getStockRankings] raw length:', data.length);
 
-  const mapped: StockRankingEntryWithId[] = data.map((dto) => ({
-    id: String(dto.id),
+  const mapped: StockRankingEntry[] = data.map((dto) => ({
+    id: dto.id,
     name: dto.stock_name,
     ticker: dto.stock_code,
     sector: dto.sector,

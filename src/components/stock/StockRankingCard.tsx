@@ -23,9 +23,22 @@ export const StockRankingCard: React.FC<StockRankingCardProps> = ({
   const formattedUpside =
     upside >= 0 ? `+${upside.toFixed(1)}%` : `${upside.toFixed(1)}%`;
 
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    if (!onClickDetail) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClickDetail();
+    }
+  };
+
   return (
     <CardWrapper
       onClick={onClickDetail}
+      onKeyDown={handleKeyDown}
+      role={onClickDetail ? 'button' : undefined}
+      tabIndex={onClickDetail ? 0 : undefined}
       $clickable={Boolean(onClickDetail)}
     >
       <HeaderRow>
