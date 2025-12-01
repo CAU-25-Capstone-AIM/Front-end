@@ -8,6 +8,7 @@ import { AnalystDetailPage } from './pages/AnalystDetailPage';
 import { StockDetailPage } from './pages/StockDetailPage';
 import { SectorDetailPage } from './pages/SectorDetailPage';
 import { Navbar } from './components/layout/Navbar';
+import { PriceForecastExamplePage } from './pages/dev/PriceForecastExamplePage';
 
 const AppLayout = styled.div`
   min-height: 100vh;
@@ -31,6 +32,7 @@ function App() {
           <Route path="/stocks/:stockId" element={<StockDetailPage />} />
           <Route path="/sectors" element={<SectorRankingPage />} />
           <Route path="/sectors/:sectorId" element={<SectorDetailPage />} />
+          <Route path="/dev/price-forecast" element={<PriceForecastExamplePage />} />
         </Routes>
       </ContentWrapper>
     </AppLayout>
