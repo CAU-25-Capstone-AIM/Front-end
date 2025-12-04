@@ -5,9 +5,7 @@ import { HeroSlider } from '../components/home/HeroSlider';
 import { AnalystTop3Section } from '../components/home/AnalystTop3Section';
 import { StockTop3Section } from '../components/home/StockTop3Section';
 import { SectorTop3Section } from '../components/home/SectorTop3Section';
-import { mockAnalystRankings } from '../mocks/analystRankings';
-import { mockStockRankings } from '../mocks/stockRankings';
-import { mockSectorRankings } from '../mocks/sectorRankings';
+import { useHomeData } from '../hooks/useHomeData';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -15,11 +13,23 @@ const PageContainer = styled.div`
   padding: 24px 16px 40px;
 `;
 
+const LoadingMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+`;
+
+const ErrorMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #ef4444;
+  font-size: 14px;
+`;
+
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const top3Analysts = [...mockAnalystRankings].sort((a, b) => a.rank - b.rank).slice(0, 3);
-  const top3Stocks = [...mockStockRankings].sort((a, b) => b.upside - a.upside).slice(0, 3);
-  const top3Sectors = [...mockSectorRankings].sort((a, b) => b.buyRatio - a.buyRatio).slice(0, 3);
+  const { data, isLoading, isError } = useHomeData();
 
   const handleGoAnalystRanking = () => {
     navigate('/analysts');
@@ -33,22 +43,44 @@ export const HomePage: React.FC = () => {
     navigate('/sectors');
   };
 
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <HeroSlider />
+        <LoadingMessage>홈 데이터를 불러오는 중입니다...</LoadingMessage>
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <HeroSlider />
+        <ErrorMessage>홈 데이터를 불러오는 중 오류가 발생했습니다.</ErrorMessage>
+      </PageContainer>
+    );
+  }
+
+  const { topAnalysts, topStocks, topSectors } = data;
+
   return (
     <PageContainer>
       <HeroSlider />
       <AnalystTop3Section
-        analysts={top3Analysts}
+        analysts={topAnalysts}
         onClickAnalystDetail={(analystId) => navigate(`/analysts/${analystId}`)}
         onClickSeeAll={handleGoAnalystRanking}
       />
       <StockTop3Section
-        stocks={top3Stocks}
+        stocks={topStocks}
         onClickStockDetail={(stockId) => navigate(`/stocks/${stockId}`)}
         onClickSeeAll={handleGoStockRanking}
       />
       <SectorTop3Section
-        sectors={top3Sectors}
-        onClickSectorDetail={(sectorId) => navigate(`/sectors/${sectorId}`)}
+        sectors={topSectors}
+        onClickSectorDetail={(sectorId) =>
+          navigate(`/sectors/${encodeURIComponent(sectorId)}`)
+        }
         onClickSeeAll={handleGoSectorRanking}
       />
     </PageContainer>
