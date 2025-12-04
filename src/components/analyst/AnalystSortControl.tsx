@@ -1,32 +1,31 @@
 import styled from 'styled-components';
-import type {
-  AnalystSortKey,
-  SortDirection,
-} from '../../hooks/useAnalystSort';
+import type { AnalystSortKey, SortDirection } from '../../hooks/useAnalystSort';
 
 type AnalystSortControlProps = {
   sortKey: AnalystSortKey;
   direction: SortDirection;
   onChangeKey: (key: AnalystSortKey) => void;
   onToggleDirection: () => void;
+  className?: string;
 };
 
-const SORT_OPTIONS: { label: string; key: AnalystSortKey }[] = [
-  { label: "AIM's Score", key: 'aimScore' },
-  { label: '정답률', key: 'accuracy' },
-  { label: '수익률', key: 'returnRate' },
-  { label: '목표가 오차율', key: 'targetError' },
+const SORT_OPTIONS: { key: AnalystSortKey; label: string }[] = [
+  { key: 'aimScore', label: "AIM's Score" },
+  { key: 'accuracy', label: '정답률' },
+  { key: 'returnRate', label: '수익률' },
+  { key: 'targetError', label: '목표가 오차율' },
 ];
 
-export const AnalystSortControl: React.FC<AnalystSortControlProps> = ({
+export const AnalystSortControl = ({
   sortKey,
   direction,
   onChangeKey,
   onToggleDirection,
-}) => {
+  className,
+}: AnalystSortControlProps) => {
   return (
-    <Wrapper>
-      <OptionsGroup>
+    <Container className={className}>
+      <SortButtons>
         {SORT_OPTIONS.map((option) => (
           <SortButton
             key={option.key}
@@ -37,58 +36,58 @@ export const AnalystSortControl: React.FC<AnalystSortControlProps> = ({
             {option.label}
           </SortButton>
         ))}
-      </OptionsGroup>
+      </SortButtons>
       <DirectionButton type="button" onClick={onToggleDirection}>
-        {direction === 'asc' ? '오름차순 ↑' : '내림차순 ↓'}
+        {direction === 'desc' ? '↓ 내림차순' : '↑ 오름차순'}
       </DirectionButton>
-    </Wrapper>
+    </Container>
   );
 };
 
-const Wrapper = styled.div`
+const Container = styled.div`
   display: flex;
-  flex-wrap: wrap;
   gap: 12px;
+  flex-wrap: wrap;
   align-items: center;
 `;
 
-const OptionsGroup = styled.div`
+const SortButtons = styled.div`
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 `;
 
 const SortButton = styled.button<{ $active: boolean }>`
-  padding: 8px 16px;
-  border: 1px solid ${({ $active }) => ($active ? '#1d4ed8' : '#e2e8f0')};
-  border-radius: 4px;
-  background-color: ${({ $active }) => ($active ? '#1d4ed8' : '#ffffff')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#1f2937')};
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid ${({ $active }) => ($active ? '#2563eb' : '#e5e7eb')};
+  background-color: ${({ $active }) => ($active ? '#2563eb' : '#ffffff')};
+  color: ${({ $active }) => ($active ? '#ffffff' : '#374151')};
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: #1d4ed8;
-    background-color: ${({ $active }) => ($active ? '#1e40af' : '#eef2ff')};
+    border-color: #2563eb;
+    background-color: ${({ $active }) => ($active ? '#1d4ed8' : '#f0f6ff')};
   }
 `;
 
 const DirectionButton = styled.button`
-  padding: 8px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
   background-color: #ffffff;
-  color: #1f2937;
-  font-size: 13px;
+  color: #374151;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: #1d4ed8;
-    background-color: #eef2ff;
+    border-color: #2563eb;
+    color: #1f2937;
   }
 `;
 

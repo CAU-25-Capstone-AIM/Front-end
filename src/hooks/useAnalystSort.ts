@@ -4,134 +4,104 @@ export type AnalystSortKey =
   | 'aimScore'
   | 'accuracy'
   | 'returnRate'
-  | 'targetError'
-  | 'recentReportDate'
-  | 'targetPrice';
+  | 'targetError';
 
 export type SortDirection = 'asc' | 'desc';
 
-type NumericLike = number | undefined;
-
-export type AnalystSortable = {
-  metrics?: {
-    compositeScore?: number;
-    aimsScore?: number;
-    accuracy?: number;
-    accuracyRate?: number;
-    avgReturn?: number;
-    returnRate?: number;
-    targetError?: number;
-    targetDiffRate?: number;
-  };
+type SortableMetrics = {
   compositeScore?: number;
-  aimsScore?: number;
   accuracy?: number;
-  accuracyRate?: number;
   avgReturn?: number;
   returnRate?: number;
   targetError?: number;
-  targetDiffRate?: number;
-  lastReportDate?: string;
-  recentReportDate?: string;
-  latestTargetPrice?: number;
-  targetPrice?: number;
 };
 
-const toTimestamp = (value?: string): NumericLike => {
-  if (!value) return undefined;
-  const time = Date.parse(value);
-  return Number.isNaN(time) ? undefined : time;
+export type SortableAnalyst = {
+  metrics?: SortableMetrics;
+  compositeScore?: number;
+  accuracy?: number;
+  avgReturn?: number;
+  returnRate?: number;
+  targetError?: number;
+  aimsScore?: number;
 };
 
-const getMetricValue = (
-  item: AnalystSortable,
-  key: AnalystSortKey,
-): NumericLike => {
+const getValueByKey = (item: SortableAnalyst, key: AnalystSortKey): number | undefined => {
+  const metrics = item.metrics ?? {};
   switch (key) {
     case 'aimScore':
       return (
+        metrics.compositeScore ??
         item.compositeScore ??
-        item.aimsScore ??
-        item.metrics?.compositeScore ??
-        item.metrics?.aimsScore
+        item.aimsScore
       );
     case 'accuracy':
-      return (
-        item.accuracy ??
-        item.accuracyRate ??
-        item.metrics?.accuracy ??
-        item.metrics?.accuracyRate
-      );
+      return metrics.accuracy ?? item.accuracy;
     case 'returnRate':
       return (
-        item.returnRate ??
+        metrics.avgReturn ??
+        metrics.returnRate ??
         item.avgReturn ??
-        item.metrics?.returnRate ??
-        item.metrics?.avgReturn
+        item.returnRate
       );
     case 'targetError':
-      return (
-        item.targetError ??
-        item.targetDiffRate ??
-        item.metrics?.targetError ??
-        item.metrics?.targetDiffRate
-      );
-    case 'recentReportDate':
-      return toTimestamp(item.recentReportDate ?? item.lastReportDate);
-    case 'targetPrice':
-      return item.latestTargetPrice ?? item.targetPrice;
+      return metrics.targetError ?? item.targetError;
     default:
       return undefined;
   }
-};
-
-const compareNumbers = (a: NumericLike, b: NumericLike) => {
-  if (a === undefined && b === undefined) return 0;
-  if (a === undefined) return 1;
-  if (b === undefined) return -1;
-  if (a === b) return 0;
-  return a < b ? -1 : 1;
 };
 
 export function useAnalystSort(
   initialKey: AnalystSortKey = 'aimScore',
   initialDirection: SortDirection = 'desc',
 ) {
-  const [sortKey, setSortKeyState] = useState<AnalystSortKey>(initialKey);
+  const [sortKey, setSortKey] = useState<AnalystSortKey>(initialKey);
   const [direction, setDirection] = useState<SortDirection>(initialDirection);
-
-  const setSortKey = useCallback((nextKey: AnalystSortKey) => {
-    setSortKeyState((prev) => {
-      if (prev === nextKey) {
-        return prev;
-      }
-      setDirection('desc');
-      return nextKey;
-    });
-  }, []);
 
   const toggleDirection = useCallback(() => {
     setDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
 
+  const selectSortKey = useCallback((key: AnalystSortKey) => {
+    setSortKey(key);
+  }, []);
+
   const sortAnalysts = useCallback(
-    <T extends AnalystSortable>(items: T[]): T[] => {
-      const copy = [...items];
-      copy.sort((a, b) => {
-        const valueA = getMetricValue(a, sortKey);
-        const valueB = getMetricValue(b, sortKey);
-        const comparison = compareNumbers(valueA, valueB);
-        return direction === 'asc' ? comparison : -comparison;
+    <T extends SortableAnalyst>(items: T[]): T[] => {
+      const sorted = [...items];
+      sorted.sort((a, b) => {
+        const aValue = getValueByKey(a, sortKey);
+        const bValue = getValueByKey(b, sortKey);
+
+        const resolvedA =
+          typeof aValue === 'number'
+            ? aValue
+            : direction === 'asc'
+              ? Number.POSITIVE_INFINITY
+              : Number.NEGATIVE_INFINITY;
+        const resolvedB =
+          typeof bValue === 'number'
+            ? bValue
+            : direction === 'asc'
+              ? Number.POSITIVE_INFINITY
+              : Number.NEGATIVE_INFINITY;
+
+        if (resolvedA === resolvedB) {
+          return 0;
+        }
+        return direction === 'asc'
+          ? resolvedA - resolvedB
+          : resolvedB - resolvedA;
       });
-      return copy;
+      return sorted;
     },
-    [sortKey, direction],
+    [direction, sortKey],
   );
 
   return {
     sortKey,
     direction,
-    setSortKey,
+    setSortKey: selectSortKey,
     toggleDirection,
     sortAnalysts,
   };

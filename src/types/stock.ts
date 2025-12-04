@@ -3,6 +3,26 @@ export type StockClosePricePoint = {
   close_price: number;
 };
 
+export type StockDailyAverageTargetPricePoint = {
+  date: string;
+  average_target_price: number;
+};
+
+export type StockLatestTargetPriceSummary = {
+  average_target_price: number;
+  max_target_price: number;
+  min_target_price: number;
+};
+
+export type StockPriceForecastChartPoint = {
+  date: string;
+  close?: number;
+  avgTargetHist?: number;
+  forecastHigh?: number;
+  forecastAvg?: number;
+  forecastLow?: number;
+};
+
 export type StockConsensus = {
   stock_id: number;
   stock_name: string;
@@ -25,27 +45,25 @@ export type StockDetail = {
   sector: string;
   consensus: StockConsensus;
   close_price_trend: StockClosePricePoint[];
+  daily_average_target_prices: StockDailyAverageTargetPricePoint[];
+  target_price_stats: StockLatestTargetPriceSummary;
+  covering_analysts: StockCoveringAnalyst[];
 };
 
-export type ClosePricePoint = StockClosePricePoint;
-
-export type DailyAverageTargetPricePoint = {
-  trade_date: string;
-  average_target_price: number;
-};
-
-export type LatestTargetPriceSummary = {
-  average_target_price: number;
-  max_target_price: number;
-  min_target_price: number;
-};
-
-export type PriceForecastChartPoint = {
-  date: string;
-  close?: number;
-  avgTargetHist?: number;
-  forecastHigh?: number;
-  forecastAvg?: number;
-  forecastLow?: number;
+export type StockCoveringAnalyst = {
+  analyst_id: number;
+  analyst_name: string;
+  firm_name: string;
+  latest_target_price: number;
+  latest_report_date: string;
+  latest_opinion: string;
+  hidden_opinion: string;
+  target_price_diff: number;
+  accuracy_rate: number;
+  return_rate: number;
+  target_diff_rate: number;
+  avg_return_diff: number;
+  avg_target_diff: number;
+  aims_score: number;
 };
 

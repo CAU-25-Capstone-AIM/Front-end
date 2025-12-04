@@ -1,12 +1,15 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnalystCard } from '../components/analyst/AnalystCard';
 import { Pagination } from '../components/common/Pagination';
-import { getAnalystRankings } from '../api/analystApi';
-import type { AnalystRankingEntry } from '../models/analyst';
-import { useAnalystSort } from '../hooks/useAnalystSort';
 import { AnalystSortControl } from '../components/analyst/AnalystSortControl';
+import { useAnalystSort, type AnalystSortKey } from '../hooks/useAnalystSort';
+import {
+  getAnalystRankings,
+  type AnalystSortKey as AnalystApiSortKey,
+} from '../api/analystApi';
+import type { AnalystRankingEntry } from '../models/analyst';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -42,6 +45,9 @@ const SortBar = styled.section`
   background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const RankingSection = styled.section`
@@ -70,12 +76,31 @@ const PAGE_SIZE = 10;
 
 export const MainAnalystRankingPage = () => {
   const navigate = useNavigate();
+  const {
+    sortKey,
+    direction,
+    setSortKey,
+    toggleDirection,
+    sortAnalysts,
+  } = useAnalystSort('aimScore', 'desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [analysts, setAnalysts] = useState<AnalystRankingEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { sortKey, direction, setSortKey, toggleDirection, sortAnalysts } =
-    useAnalystSort('accuracy', 'desc');
+
+  const mapSortKeyToApiKey = (key: AnalystSortKey): AnalystApiSortKey => {
+    switch (key) {
+      case 'returnRate':
+        return 'returnRate';
+      case 'targetError':
+        return 'targetDiffRate';
+      case 'aimScore':
+        return 'aimsScore';
+      case 'accuracy':
+      default:
+        return 'accuracyRate';
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -85,7 +110,8 @@ export const MainAnalystRankingPage = () => {
         setLoading(true);
         setError(null);
 
-        const data = await getAnalystRankings('accuracyRate');
+        const apiSortKey = mapSortKeyToApiKey(sortKey);
+        const data = await getAnalystRankings(apiSortKey);
 
         if (isMounted) {
           setAnalysts(data);
@@ -108,10 +134,13 @@ export const MainAnalystRankingPage = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [sortKey]);
 
-  // 페이지네이션 계산
-  const sortedAnalysts = sortAnalysts(analysts);
+  const sortedAnalysts = useMemo(
+    () => sortAnalysts(analysts),
+    [analysts, sortAnalysts],
+  );
+
   const totalPages =
     sortedAnalysts.length > 0 ? Math.ceil(sortedAnalysts.length / PAGE_SIZE) : 0;
   const startIndex = (currentPage - 1) * PAGE_SIZE;

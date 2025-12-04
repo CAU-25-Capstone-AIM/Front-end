@@ -1,13 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { mockStockRankings } from '../../mocks/stockRankings';
 import { StockMiniCard } from '../stock/StockMiniCard';
-
-export type StockRankingEntry = (typeof mockStockRankings)[number];
+import type { StockRankingEntry } from '../../models/stock';
 
 export type StockTop3SectionProps = {
   stocks: StockRankingEntry[];
-  onClickStockDetail?: (ticker: string) => void;
+  onClickStockDetail?: (stockId: number) => void;
   onClickSeeAll?: () => void;
 };
 
@@ -37,7 +35,7 @@ export const StockTop3Section: React.FC<StockTop3SectionProps> = ({
       <CardsRow>
         {stocks.map((stock, index) => (
           <StockMiniCard
-            key={stock.ticker}
+            key={stock.id}
             rank={index + 1}
             name={stock.name}
             ticker={stock.ticker}
@@ -46,7 +44,7 @@ export const StockTop3Section: React.FC<StockTop3SectionProps> = ({
             buyRatio={stock.buyRatio}
             onClickDetail={() => {
               if (onClickStockDetail) {
-                onClickStockDetail(stock.ticker);
+                onClickStockDetail(stock.id);
               }
             }}
           />

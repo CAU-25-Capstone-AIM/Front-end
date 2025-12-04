@@ -43,7 +43,7 @@ export const HomePage: React.FC = () => {
       />
       <StockTop3Section
         stocks={top3Stocks}
-        onClickStockDetail={(ticker) => navigate(`/stocks/${ticker}`)}
+        onClickStockDetail={(stockId) => navigate(`/stocks/${stockId}`)}
         onClickSeeAll={handleGoStockRanking}
       />
       <SectorTop3Section

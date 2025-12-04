@@ -403,7 +403,7 @@ export const AnalystDetailPage = () => {
               <TableRow key={stock.id}>
                 <TableCell>
                   <StockNameLink
-                    onClick={() => navigate(`/stocks/${stock.code}`)}
+                    onClick={() => navigate(`/stocks/${stock.id}`)}
                   >
                     {stock.name}
                   </StockNameLink>

@@ -1,16 +1,46 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { mockSectorRankings } from '../mocks/sectorRankings';
 import { SectorRankingCard } from '../components/sector/SectorRankingCard';
+import { useSectorRankings } from '../hooks/useSectorRankings';
 
 type SectorSortType = 'buyHigh' | 'buyLow';
 
 export const SectorRankingPage = () => {
   const navigate = useNavigate();
   const [sortType, setSortType] = useState<SectorSortType>('buyHigh');
+  const { data, isLoading, isError } = useSectorRankings();
+  const sectors = data ?? [];
 
-  const sortedSectors = [...mockSectorRankings].sort((a, b) => {
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <HeaderSection>
+          <PageTitle>섹터 랭킹</PageTitle>
+          <PageDescription>
+            섹터별 애널리스트 의견 비율을 기반으로 매수 선호도가 높은 섹터를 확인합니다.
+          </PageDescription>
+        </HeaderSection>
+        <LoadingMessage>섹터 랭킹을 불러오는 중입니다...</LoadingMessage>
+      </PageContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageContainer>
+        <HeaderSection>
+          <PageTitle>섹터 랭킹</PageTitle>
+          <PageDescription>
+            섹터별 애널리스트 의견 비율을 기반으로 매수 선호도가 높은 섹터를 확인합니다.
+          </PageDescription>
+        </HeaderSection>
+        <ErrorMessage>섹터 랭킹을 불러오는 중 오류가 발생했습니다.</ErrorMessage>
+      </PageContainer>
+    );
+  }
+
+  const sortedSectors = [...sectors].sort((a, b) => {
     if (sortType === 'buyHigh') {
       return b.buyRatio - a.buyRatio; // 매수율 높은 순
     }
@@ -135,5 +165,19 @@ const CardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`;
+
+const LoadingMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+`;
+
+const ErrorMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: #ef4444;
+  font-size: 14px;
 `;
 

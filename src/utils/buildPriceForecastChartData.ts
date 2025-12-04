@@ -1,135 +1,125 @@
 import type {
-  ClosePricePoint,
-  DailyAverageTargetPricePoint,
-  LatestTargetPriceSummary,
-  PriceForecastChartPoint,
+  StockClosePricePoint,
+  StockDailyAverageTargetPricePoint,
+  StockLatestTargetPriceSummary,
+  StockPriceForecastChartPoint,
 } from '../types/stock';
 
-type BuildParams = {
-  closePriceTrend: ClosePricePoint[];
-  dailyAverageTargetPrices: DailyAverageTargetPricePoint[];
-  latestTargetPriceSummary: LatestTargetPriceSummary;
+type BuildPriceForecastChartDataParams = {
+  closePriceTrend: StockClosePricePoint[];
+  dailyAverageTargetPrices: StockDailyAverageTargetPricePoint[];
+  latestTargetPriceSummary: StockLatestTargetPriceSummary;
 };
 
-const DATE_LENGTH = 10;
+const FIVE_YEARS = 5;
+const ONE_YEAR = 1;
 
-const normalizeDate = (value: string): string => {
-  if (!value) {
-    return '';
-  }
-  const hasTime = value.includes('T');
-  if (!hasTime && value.length >= DATE_LENGTH) {
-    return value.slice(0, DATE_LENGTH);
-  }
-  const date = new Date(value);
-  if (!Number.isNaN(date.getTime())) {
-    return date.toISOString().slice(0, DATE_LENGTH);
-  }
-  const fallbackMatch = value.match(/^\d{4}-\d{2}-\d{2}/);
-  return fallbackMatch ? fallbackMatch[0] : value;
-};
-
-const compareDateStrings = (a: string, b: string) =>
-  normalizeDate(a).localeCompare(normalizeDate(b));
-
-const addYears = (dateString: string, deltaYears: number): string => {
-  const date = new Date(`${normalizeDate(dateString)}T00:00:00Z`);
+const toDateOnly = (raw: string): string => {
+  const date = new Date(raw);
   if (Number.isNaN(date.getTime())) {
-    return normalizeDate(dateString);
+    return raw.split('T')[0] ?? raw;
   }
-  date.setUTCFullYear(date.getUTCFullYear() + deltaYears);
-  return date.toISOString().slice(0, DATE_LENGTH);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
-const ensurePoint = (
-  pointsMap: Map<string, PriceForecastChartPoint>,
-  date: string,
-): PriceForecastChartPoint => {
-  const normalized = normalizeDate(date);
-  const existing = pointsMap.get(normalized);
-  if (existing) {
-    return existing;
+const addYears = (dateString: string, years: number): string => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
   }
-  const point: PriceForecastChartPoint = { date: normalized };
-  pointsMap.set(normalized, point);
-  return point;
+  date.setFullYear(date.getFullYear() + years);
+  return toDateOnly(date.toISOString());
+};
+
+const subtractYears = (dateString: string, years: number): string => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+  date.setFullYear(date.getFullYear() - years);
+  return toDateOnly(date.toISOString());
 };
 
 export function buildPriceForecastChartData({
   closePriceTrend,
   dailyAverageTargetPrices,
   latestTargetPriceSummary,
-}: BuildParams): PriceForecastChartPoint[] {
+}: BuildPriceForecastChartDataParams): StockPriceForecastChartPoint[] {
   if (!closePriceTrend.length) {
     return [];
   }
 
-  const sortedCloseTrend = [...closePriceTrend].sort((a, b) =>
-    compareDateStrings(a.trade_date, b.trade_date),
-  );
-  const sortedAvgTargets = [...dailyAverageTargetPrices].sort((a, b) =>
-    compareDateStrings(a.trade_date, b.trade_date),
+  const sortedCloses = [...closePriceTrend].sort(
+    (a, b) =>
+      new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime(),
   );
 
-  const lastClosePoint = sortedCloseTrend[sortedCloseTrend.length - 1];
-  const lastDate = normalizeDate(lastClosePoint.trade_date);
+  const lastClosePoint = sortedCloses[sortedCloses.length - 1];
+  const lastDate = toDateOnly(lastClosePoint.trade_date);
   const lastClose = lastClosePoint.close_price;
-  const windowStartDate = addYears(lastDate, -5);
+  const windowStartDate = subtractYears(lastDate, FIVE_YEARS);
 
-  const windowedCloses = sortedCloseTrend.filter((point) => {
-    const normalized = normalizeDate(point.trade_date);
-    return normalized >= windowStartDate && normalized <= lastDate;
+  const windowedCloses = sortedCloses.filter((point) => {
+    const dateOnly = toDateOnly(point.trade_date);
+    return dateOnly >= windowStartDate && dateOnly <= lastDate;
   });
 
-  if (windowedCloses.length === 0) {
-    windowedCloses.push(lastClosePoint);
-  }
+  const sortedAvgTargets = [...dailyAverageTargetPrices].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
 
   const avgTargetMap = new Map<string, number>();
-  sortedAvgTargets.forEach((point) => {
-    avgTargetMap.set(normalizeDate(point.trade_date), point.average_target_price);
-  });
+  sortedAvgTargets
+    .filter((point) => toDateOnly(point.date) <= lastDate)
+    .forEach((point) => {
+      avgTargetMap.set(toDateOnly(point.date), point.average_target_price);
+    });
 
-  const chartPointsMap = new Map<string, PriceForecastChartPoint>();
+  const historicalPoints: StockPriceForecastChartPoint[] = windowedCloses
+    .map((point) => {
+      const date = toDateOnly(point.trade_date);
+      return {
+        date,
+        close: point.close_price,
+        avgTargetHist: avgTargetMap.get(date),
+      };
+    })
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  windowedCloses.forEach((point) => {
-    const date = normalizeDate(point.trade_date);
-    const chartPoint = ensurePoint(chartPointsMap, date);
-    chartPoint.close = point.close_price;
-    if (avgTargetMap.has(date)) {
-      chartPoint.avgTargetHist = avgTargetMap.get(date);
-    }
-  });
-
-  const lastPointEntry = ensurePoint(chartPointsMap, lastDate);
-  lastPointEntry.close = lastClose;
-
-  const lastAvgTargetValue =
-    sortedAvgTargets.length > 0
-      ? sortedAvgTargets[sortedAvgTargets.length - 1].average_target_price
-      : latestTargetPriceSummary.average_target_price;
-
-  lastPointEntry.forecastHigh = lastAvgTargetValue;
-  lastPointEntry.forecastAvg = lastAvgTargetValue;
-  lastPointEntry.forecastLow = lastAvgTargetValue;
-
-  const forecastEndDate = addYears(lastDate, 1);
-  const forecastEndPoint = ensurePoint(chartPointsMap, forecastEndDate);
-  forecastEndPoint.forecastHigh = latestTargetPriceSummary.max_target_price;
-  forecastEndPoint.forecastAvg = latestTargetPriceSummary.average_target_price;
-  forecastEndPoint.forecastLow = latestTargetPriceSummary.min_target_price;
-  forecastEndPoint.close = lastClose;
-
-  const result = Array.from(chartPointsMap.values()).sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
-
-  if (!result.some((point) => point.date === lastDate)) {
-    const fallbackLastPoint = { date: lastDate, close: lastClose };
-    result.push(fallbackLastPoint);
-    result.sort((a, b) => a.date.localeCompare(b.date));
+  if (!historicalPoints.length) {
+    return [];
   }
 
-  return result;
+  const lastHistoricalPoint =
+    historicalPoints[historicalPoints.length - 1] ?? historicalPoints[0];
+
+  const lastAvgTargetValue =
+    sortedAvgTargets[sortedAvgTargets.length - 1]?.average_target_price ??
+    latestTargetPriceSummary.average_target_price;
+
+  const forecastStart: StockPriceForecastChartPoint = {
+    ...lastHistoricalPoint,
+    close: lastClose,
+    avgTargetHist: lastHistoricalPoint.avgTargetHist ?? lastAvgTargetValue,
+    forecastHigh: lastAvgTargetValue,
+    forecastAvg: lastAvgTargetValue,
+    forecastLow: lastAvgTargetValue,
+  };
+
+  const forecastEndDate = addYears(lastDate, ONE_YEAR);
+  const forecastEnd: StockPriceForecastChartPoint = {
+    date: forecastEndDate,
+    close: lastClose,
+    forecastHigh: latestTargetPriceSummary.max_target_price,
+    forecastAvg: latestTargetPriceSummary.average_target_price,
+    forecastLow: latestTargetPriceSummary.min_target_price,
+  };
+
+  const historicalWithoutLast = historicalPoints.slice(0, -1);
+  return [...historicalWithoutLast, forecastStart, forecastEnd];
 }
+
 
