@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 import { SectorDetailHeader } from '../components/sector/SectorDetailHeader';
 import { SectorConsensusSummary } from '../components/sector/SectorConsensusSummary';
 import { SectorStockListSection } from '../components/sector/SectorStockListSection';
@@ -43,7 +44,12 @@ const SectorDetailContent: React.FC<SectorDetailContentProps> = ({ sectorId }) =
 };
 
 export const SectorDetailPage: React.FC = () => {
-  return <SectorDetailContent sectorId="sector-tech" />;
+  const { sectorId } = useParams<{ sectorId: string }>();
+  return (
+    <SectorDetailContent
+      sectorId={sectorId ? decodeURIComponent(sectorId) : undefined}
+    />
+  );
 };
 
 type SectorDetailPreviewProps = {

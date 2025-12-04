@@ -84,7 +84,7 @@ export const SectorRankingPage = () => {
               ratings={sector.ratings}
               buyRatio={sector.buyRatio}
               rank={index + 1}
-              onClickDetail={() => navigate(`/sectors/${sector.id}`)}
+              onClickDetail={() => navigate(`/sectors/${encodeURIComponent(sector.id)}`)}
             />
           ))}
         </CardList>
