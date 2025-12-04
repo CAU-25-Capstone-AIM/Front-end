@@ -6,7 +6,6 @@ import {
   Tooltip,
   Legend,
   Line,
-  Area,
   ReferenceLine,
 } from 'recharts';
 import type {
