@@ -4,22 +4,40 @@ import { useParams } from 'react-router-dom';
 import { SectorDetailHeader } from '../components/sector/SectorDetailHeader';
 import { SectorConsensusSummary } from '../components/sector/SectorConsensusSummary';
 import { SectorStockListSection } from '../components/sector/SectorStockListSection';
-import { mockSectorDetails } from '../mocks/sectorDetails';
+import { useSectorDetail } from '../hooks/useSectorDetail';
 
 type SectorDetailContentProps = {
   sectorId?: string;
 };
 
 const SectorDetailContent: React.FC<SectorDetailContentProps> = ({ sectorId }) => {
-  const sector = mockSectorDetails.find((item) => item.id === sectorId);
+  const { data, isLoading, isError } = useSectorDetail(sectorId);
 
-  if (!sector) {
+  if (!sectorId) {
     return (
       <PageContainer>
         <EmptyState>섹터를 찾을 수 없습니다.</EmptyState>
       </PageContainer>
     );
   }
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <EmptyState>섹터 정보를 불러오는 중입니다...</EmptyState>
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <EmptyState>섹터를 찾을 수 없습니다.</EmptyState>
+      </PageContainer>
+    );
+  }
+
+  const sector = data;
 
   return (
     <PageContainer>
