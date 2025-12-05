@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { HeroSlide } from './HeroSlide';
@@ -48,17 +48,65 @@ const slides: HeroSlideConfig[] = [
 
 export const HeroSlider: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  
+  // 타이머 관련 상태를 ref로 관리
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
+  const remainingTimeRef = useRef<number>(AUTO_INTERVAL_MS);
+
+  // 다음 슬라이드로 이동하는 함수
+  const goToNextSlide = () => {
+    setActiveIndex((prev) => (prev + 1) % slides.length);
+    remainingTimeRef.current = AUTO_INTERVAL_MS;
+    startTimeRef.current = Date.now();
+  };
+
+  // 타이머 시작 함수
+  const startTimer = (delay: number = AUTO_INTERVAL_MS) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    
+    startTimeRef.current = Date.now();
+    remainingTimeRef.current = delay;
+    
+    timerRef.current = setTimeout(() => {
+      goToNextSlide();
+    }, delay);
+  };
+
+  // 타이머 일시 정지 함수
+  const pauseTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // 경과 시간 계산
+    const elapsed = Date.now() - startTimeRef.current;
+    remainingTimeRef.current = Math.max(0, remainingTimeRef.current - elapsed);
+  };
+
+  // 타이머 재개 함수
+  const resumeTimer = () => {
+    startTimer(remainingTimeRef.current);
+  };
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, AUTO_INTERVAL_MS);
+    if (isHovered) {
+      pauseTimer();
+    } else {
+      resumeTimer();
+    }
 
     return () => {
-      clearInterval(timer);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
-  }, []);
+  }, [isHovered, activeIndex]);
 
   const handlePrev = () => {
     setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
@@ -90,7 +138,10 @@ export const HeroSlider: React.FC = () => {
   };
 
   return (
-    <SliderWrapper>
+    <SliderWrapper
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <ArrowButton type="button" aria-label="이전 슬라이드" onClick={handlePrev} $position="left">
         ‹
       </ArrowButton>
