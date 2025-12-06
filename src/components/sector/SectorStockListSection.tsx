@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import type { StockRankingEntry } from '../../models/stock';
 import { StockRankingCard } from '../stock/StockRankingCard';
 
@@ -10,6 +11,7 @@ type SectorStockListSectionProps = {
 };
 
 export const SectorStockListSection: React.FC<SectorStockListSectionProps> = ({ stocks }) => {
+  const navigate = useNavigate();
   const [sortType, setSortType] = useState<StockSortType>('upsideHigh');
 
   const sortedStocks = useMemo(() => {
@@ -56,6 +58,7 @@ export const SectorStockListSection: React.FC<SectorStockListSectionProps> = ({ 
             upside={stock.upside}
             buyRatio={stock.buyRatio}
             rank={index + 1}
+            onClickDetail={() => navigate(`/stocks/${stock.id}`)}
           />
         ))}
       </CardList>
