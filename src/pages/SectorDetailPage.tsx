@@ -46,7 +46,6 @@ const SectorDetailContent: React.FC<SectorDetailContentProps> = ({ sectorId }) =
         totalStocks={sector.totalStocks}
         buyRatio={sector.buyRatio}
         rank={sector.rank}
-        ratings={sector.ratings}
       />
 
       <SectionCard>

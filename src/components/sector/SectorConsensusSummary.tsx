@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import type { SectorConsensusBreakdown } from '../../models/sector';
 
 type SectorConsensusSummaryProps = {
@@ -15,6 +16,14 @@ const ratingLabels: Record<keyof SectorConsensusBreakdown, string> = {
   strongSell: 'Strong Sell',
 };
 
+const ratingColors: Record<keyof SectorConsensusBreakdown, string> = {
+  strongBuy: '#166534',
+  moderateBuy: '#4ADE80',
+  hold: '#9CA3AF',
+  moderateSell: '#FB7185',
+  strongSell: '#B91C1C',
+};
+
 export const SectorConsensusSummary: React.FC<SectorConsensusSummaryProps> = ({ totalStocks, ratings }) => {
   const denominator = totalStocks > 0 ? totalStocks : 1;
   const entries = (Object.keys(ratings) as (keyof SectorConsensusBreakdown)[]).map((key) => ({
@@ -22,14 +31,37 @@ export const SectorConsensusSummary: React.FC<SectorConsensusSummaryProps> = ({ 
     label: ratingLabels[key],
     count: ratings[key],
     ratio: (ratings[key] / denominator) * 100,
+    color: ratingColors[key],
   }));
+
+  // 파이 차트용 데이터 (값이 0인 항목 제외)
+  const chartData = entries.filter((item) => item.count > 0);
 
   return (
     <Card>
-      <DonutCircle>
-        <DonutValue>{totalStocks}</DonutValue>
-        <DonutLabel>총 종목</DonutLabel>
-      </DonutCircle>
+      <ChartContainer>
+        <ResponsiveContainer width={120} height={120}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="count"
+              nameKey="label"
+              cx="50%"
+              cy="50%"
+              innerRadius={35}
+              outerRadius={60}
+            >
+              {chartData.map((entry) => (
+                <Cell key={entry.key} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <ChartCenter>
+          <CenterValue>{totalStocks}</CenterValue>
+          <CenterLabel>총 종목</CenterLabel>
+        </ChartCenter>
+      </ChartContainer>
       <List>
         {entries.map((item) => (
           <ListItem key={item.key}>
@@ -54,29 +86,36 @@ const Card = styled.div`
   gap: 20px;
 `;
 
-const DonutCircle = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 6px solid #38bdf8;
-  box-shadow: inset 0 0 0 4px #e5e7eb;
+const ChartContainer = styled.div`
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+`;
+
+const ChartCenter = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  pointer-events: none;
 `;
 
-const DonutValue = styled.span`
-  font-size: 16px;
+const CenterValue = styled.span`
+  font-size: 20px;
   font-weight: 700;
   color: #0f172a;
   line-height: 1;
 `;
 
-const DonutLabel = styled.span`
-  font-size: 10px;
+const CenterLabel = styled.span`
+  font-size: 11px;
   color: #6b7280;
+  margin-top: 2px;
 `;
 
 const List = styled.div`

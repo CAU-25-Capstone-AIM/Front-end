@@ -1,14 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import type { SectorConsensusBreakdown } from '../../models/sector';
 
 type SectorDetailHeaderProps = {
   name: string;
   totalStocks: number;
   buyRatio: number;
   rank?: number;
-  ratings: SectorConsensusBreakdown;
 };
 
 export const SectorDetailHeader: React.FC<SectorDetailHeaderProps> = ({
@@ -16,20 +13,7 @@ export const SectorDetailHeader: React.FC<SectorDetailHeaderProps> = ({
   totalStocks,
   buyRatio,
   rank,
-  ratings,
 }) => {
-  const denominator = totalStocks > 0 ? totalStocks : 1;
-  const chartData = [
-    {
-      key: 'consensus',
-      strongBuy: (ratings.strongBuy / denominator) * 100,
-      moderateBuy: (ratings.moderateBuy / denominator) * 100,
-      hold: (ratings.hold / denominator) * 100,
-      moderateSell: (ratings.moderateSell / denominator) * 100,
-      strongSell: (ratings.strongSell / denominator) * 100,
-    },
-  ];
-
   return (
     <Container>
       <HeaderRow>
@@ -43,20 +27,6 @@ export const SectorDetailHeader: React.FC<SectorDetailHeaderProps> = ({
           <RankBadge>{`#${rank}`}</RankBadge>
         )}
       </HeaderRow>
-
-      <ChartWrapper>
-        <ResponsiveContainer width="100%" height={40}>
-          <BarChart data={chartData} layout="vertical">
-            <XAxis type="number" hide />
-            <YAxis type="category" dataKey="key" hide />
-            <Bar dataKey="strongBuy" stackId="consensus" fill="#0f766e" />
-            <Bar dataKey="moderateBuy" stackId="consensus" fill="#38bdf8" />
-            <Bar dataKey="hold" stackId="consensus" fill="#9ca3af" />
-            <Bar dataKey="moderateSell" stackId="consensus" fill="#a855f7" />
-            <Bar dataKey="strongSell" stackId="consensus" fill="#7e22ce" />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartWrapper>
     </Container>
   );
 };
@@ -99,10 +69,5 @@ const RankBadge = styled.span`
   color: #ffffff;
   font-weight: 600;
   font-size: 14px;
-`;
-
-const ChartWrapper = styled.div`
-  width: 100%;
-  height: 40px;
 `;
 

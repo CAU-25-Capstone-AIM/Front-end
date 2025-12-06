@@ -88,36 +88,36 @@ export const SectorRankingCard: React.FC<SectorRankingCardProps> = ({
       <ChartContainer>
         <ResponsiveContainer width="100%" height={28}>
           <BarChart data={chartData} layout="vertical">
-            <XAxis type="number" hide />
+            <XAxis type="number" hide domain={[0, 100]} />
             <YAxis type="category" dataKey="name" hide />
             <Tooltip content={<CustomTooltip name={name} totalStocks={totalStocks} ratings={ratings} />} />
-            <Bar dataKey="strongBuy" stackId="consensus" fill="#0f766e" />
-            <Bar dataKey="moderateBuy" stackId="consensus" fill="#38bdf8" />
-            <Bar dataKey="hold" stackId="consensus" fill="#9ca3af" />
-            <Bar dataKey="moderateSell" stackId="consensus" fill="#a855f7" />
-            <Bar dataKey="strongSell" stackId="consensus" fill="#7e22ce" />
+            <Bar dataKey="strongBuy" stackId="consensus" fill="#166534" />
+            <Bar dataKey="moderateBuy" stackId="consensus" fill="#4ADE80" />
+            <Bar dataKey="hold" stackId="consensus" fill="#9CA3AF" />
+            <Bar dataKey="moderateSell" stackId="consensus" fill="#FB7185" />
+            <Bar dataKey="strongSell" stackId="consensus" fill="#B91C1C" />
           </BarChart>
         </ResponsiveContainer>
       </ChartContainer>
       <LegendRow>
         <LegendItem>
-          <LegendColorBox $color="#0f766e" />
+          <LegendColorBox $color="#166534" />
           <LegendLabel>Strong Buy</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendColorBox $color="#38bdf8" />
+          <LegendColorBox $color="#4ADE80" />
           <LegendLabel>Moderate Buy</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendColorBox $color="#9ca3af" />
+          <LegendColorBox $color="#9CA3AF" />
           <LegendLabel>Hold</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendColorBox $color="#a855f7" />
+          <LegendColorBox $color="#FB7185" />
           <LegendLabel>Moderate Sell</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendColorBox $color="#7e22ce" />
+          <LegendColorBox $color="#B91C1C" />
           <LegendLabel>Strong Sell</LegendLabel>
         </LegendItem>
       </LegendRow>
