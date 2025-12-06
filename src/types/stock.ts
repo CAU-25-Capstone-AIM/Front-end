@@ -66,5 +66,7 @@ export type StockCoveringAnalyst = {
   avg_return_diff: number;
   avg_target_diff: number;
   aims_score: number;
+  rank: number;
+  total_analysts: number;
 };
 

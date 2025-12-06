@@ -86,6 +86,23 @@ const RankBadge = styled.div`
   color: #ffffff;
 `;
 
+const RankWithStars = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: #2563eb;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+`;
+
+const StarIcon = styled.span`
+  color: #fbbf24;
+  font-size: 14px;
+`;
+
 const MetricsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -151,13 +168,14 @@ const MetricsDefault: React.FC<{
   </MetricsGrid>
 );
 
-// 종목 상세 페이지용 메트릭 (최신 의견, 최신 목표가, 최신 리포트)
+// 종목 상세 페이지용 메트릭 (AIM's Score, 최신 의견, 최신 목표가, 최신 리포트)
 const MetricsStockDetail: React.FC<{
   latestOpinion?: string | null;
   hiddenOpinion?: string | null;
   latestTargetPrice?: number | null;
   latestReportDate?: string | null;
-}> = ({ latestOpinion, hiddenOpinion, latestTargetPrice, latestReportDate }) => {
+  compositeScore?: number;
+}> = ({ latestOpinion, hiddenOpinion, latestTargetPrice, latestReportDate, compositeScore }) => {
   // latest_opinion / hidden_opinion 형식으로 표시
   let opinionDisplay: React.ReactNode = '-';
 
@@ -175,23 +193,35 @@ const MetricsStockDetail: React.FC<{
   }
 
   return (
-    <MetricsGrid>
-      <MetricItem>
-        <MetricLabel>
-          <span style={{ fontWeight: 400, color: '#666' }}>최신 의견/</span>
-          <span style={{ fontWeight: 700, color: '#2563eb' }}>AIM&apos;s opinion</span>
-        </MetricLabel>
-        <MetricValue>{opinionDisplay}</MetricValue>
-      </MetricItem>
-      <MetricItem>
-        <MetricLabel>최신 목표가</MetricLabel>
-        <MetricValue>{formatCurrency(latestTargetPrice)}</MetricValue>
-      </MetricItem>
-      <MetricItem>
-        <MetricLabel>최신 리포트</MetricLabel>
-        <MetricValue>{formatDate(latestReportDate)}</MetricValue>
-      </MetricItem>
-    </MetricsGrid>
+    <>
+      <MetricsGrid>
+        <MetricItem>
+          <MetricLabel>
+            <span style={{ fontWeight: 700, color: '#2563eb' }}>AIM&apos;s Score</span>
+          </MetricLabel>
+          <MetricValue style={{ color: '#2563eb', fontSize: '18px' }}>
+            {compositeScore ?? '-'}
+          </MetricValue>
+        </MetricItem>
+        <MetricItem>
+          <MetricLabel>
+            <span style={{ fontWeight: 400, color: '#666' }}>최신 의견/</span>
+            <span style={{ fontWeight: 700, color: '#2563eb' }}>AIM&apos;s opinion</span>
+          </MetricLabel>
+          <MetricValue>{opinionDisplay}</MetricValue>
+        </MetricItem>
+        <MetricItem>
+          <MetricLabel>최신 목표가</MetricLabel>
+          <MetricValue>{formatCurrency(latestTargetPrice)}</MetricValue>
+        </MetricItem>
+      </MetricsGrid>
+      <MetricsGrid style={{ marginTop: '12px' }}>
+        <MetricItem>
+          <MetricLabel>최신 리포트</MetricLabel>
+          <MetricValue>{formatDate(latestReportDate)}</MetricValue>
+        </MetricItem>
+      </MetricsGrid>
+    </>
   );
 };
 
@@ -213,6 +243,16 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
 }) => {
   const clickable = Boolean(onClickDetail);
   const isStockDetail = variant === 'stockDetail';
+
+  // 등수에 따른 별 개수 계산
+  const getStarCount = (rankValue: number): number => {
+    if (rankValue >= 1 && rankValue <= 20) return 3;
+    if (rankValue >= 21 && rankValue <= 60) return 2;
+    if (rankValue >= 61 && rankValue <= 100) return 1;
+    return 0;
+  };
+
+  const starCount = rank ? getStarCount(rank) : 0;
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
     if (!clickable) {
@@ -244,7 +284,16 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
             </TagContainer>
           )}
         </NameSection>
-        {rank && <RankBadge>#{rank}</RankBadge>}
+        {rank && isStockDetail && starCount > 0 ? (
+          <RankWithStars>
+            #{rank}
+            {Array.from({ length: starCount }).map((_, i) => (
+              <StarIcon key={i}>★</StarIcon>
+            ))}
+          </RankWithStars>
+        ) : rank ? (
+          <RankBadge>#{rank}</RankBadge>
+        ) : null}
       </Header>
       {isStockDetail ? (
         <MetricsStockDetail
@@ -252,19 +301,22 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
           hiddenOpinion={hiddenOpinion}
           latestTargetPrice={latestTargetPrice}
           latestReportDate={latestReportDate}
+          compositeScore={compositeScore}
         />
       ) : (
-        <MetricsDefault
-          accuracy={accuracy}
-          avgReturn={avgReturn}
-          targetError={targetError}
-        />
-      )}
-      {compositeScore !== undefined && (
-        <ScoreSection>
-          <ScoreLabel>AIM's Score</ScoreLabel>
-          <ScoreValue>{compositeScore}</ScoreValue>
-        </ScoreSection>
+        <>
+          <MetricsDefault
+            accuracy={accuracy}
+            avgReturn={avgReturn}
+            targetError={targetError}
+          />
+          {compositeScore !== undefined && (
+            <ScoreSection>
+              <ScoreLabel>AIM's Score</ScoreLabel>
+              <ScoreValue>{compositeScore}</ScoreValue>
+            </ScoreSection>
+          )}
+        </>
       )}
     </Container>
   );

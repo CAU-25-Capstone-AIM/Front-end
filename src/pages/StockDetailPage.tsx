@@ -160,6 +160,7 @@ export const StockDetailPage = () => {
       avgReturn: analyst.return_rate ?? 0,
       targetError: analyst.target_diff_rate ?? 0,
       compositeScore: analyst.aims_score ?? 0,
+      rank: analyst.rank,
       metrics: {
         accuracy: analyst.accuracy_rate ?? 0,
         avgReturn: analyst.return_rate ?? 0,
@@ -292,6 +293,7 @@ export const StockDetailPage = () => {
                 key={analyst.id}
                 name={analyst.name}
                 firm={analyst.firm}
+                rank={analyst.rank}
                 sectors={analyst.sectors}
                 compositeScore={analyst.compositeScore}
                 variant="stockDetail"
