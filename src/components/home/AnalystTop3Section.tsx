@@ -19,9 +19,9 @@ export const AnalystTop3Section: React.FC<AnalystTop3SectionProps> = ({
   return (
     <SectionWrapper>
       <SectionHeader>
-        <SectionTitle>신뢰도 TOP 애널리스트</SectionTitle>
+        <SectionTitle>랭킹 TOP3 애널리스트</SectionTitle>
         <SectionSubtitle>
-          정답률, 수익률, 목표가 오차율을 종합해 산출한 AIM 랭킹입니다.
+          AIM's Score는 정답률, 수익률, 목표가 오차율을 종합해 산출한 지표입니다.
         </SectionSubtitle>
         <SectionAction
           type="button"

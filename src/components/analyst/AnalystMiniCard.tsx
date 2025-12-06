@@ -30,6 +30,10 @@ export const AnalystMiniCard: React.FC<AnalystMiniCardProps> = ({
         </NameArea>
       </HeaderRow>
       <MetricsRow>
+      <MetricItem>
+          <MetricLabel>AIM Score</MetricLabel>
+          <MetricValue>{compositeScore.toFixed(1)}</MetricValue>
+        </MetricItem>
         <MetricItem>
           <MetricLabel>정답률</MetricLabel>
           <MetricValue>{accuracy.toFixed(1)}%</MetricValue>
@@ -38,10 +42,7 @@ export const AnalystMiniCard: React.FC<AnalystMiniCardProps> = ({
           <MetricLabel>평균 수익률</MetricLabel>
           <MetricValue>{avgReturn.toFixed(1)}%</MetricValue>
         </MetricItem>
-        <MetricItem>
-          <MetricLabel>AIM Score</MetricLabel>
-          <MetricValue>{compositeScore.toFixed(1)}</MetricValue>
-        </MetricItem>
+        
       </MetricsRow>
     </CardWrapper>
   );
