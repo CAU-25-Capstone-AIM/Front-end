@@ -21,6 +21,7 @@ export type StockPriceForecastChartPoint = {
   forecastHigh?: number;
   forecastAvg?: number;
   forecastLow?: number;
+  isForecast?: boolean;
 };
 
 export type StockConsensus = {

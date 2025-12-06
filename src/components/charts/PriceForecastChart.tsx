@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import {
   ResponsiveContainer,
-  ComposedChart,
+  LineChart,
   XAxis,
   YAxis,
   Tooltip,
@@ -14,7 +15,10 @@ import type {
   StockLatestTargetPriceSummary as TargetPriceStats,
   StockPriceForecastChartPoint as PriceForecastChartPoint,
 } from '../../types/stock';
-import { buildPriceForecastChartData } from '../../utils/buildPriceForecastChartData';
+import {
+  buildPriceForecastChartData,
+  fillMissingDates,
+} from '../../utils/buildPriceForecastChartData';
 
 type PriceForecastChartProps = {
   closePriceTrend: ClosePricePoint[];
@@ -34,7 +38,7 @@ const formatTickMonth = (value: string) => {
   if (!year || !month) {
     return value;
   }
-  return `${year.slice(2)}-${month}`;
+  return `${year.slice(2)}.${month}`;
 };
 
 const formatPrice = (value?: number) =>
@@ -109,8 +113,8 @@ const PriceForecastLegend = () => (
       color: '#4b5563',
     }}
   >
-    <LegendItem color="#111827" label="종가" />
-    <LegendItem color="#d2a84b" label="이전 애널리스트 평균 목표주가" />
+    <LegendItem color="#6b84d4" label="종가" />
+    <LegendItem color="#e2b053" label="이전 애널리스트 평균 목표주가" />
   </div>
 );
 
@@ -129,21 +133,81 @@ const LegendItem = ({ color, label }: { color: string; label: string }) => (
   </span>
 );
 
+const ForecastDot = (props: {
+  cx?: number;
+  cy?: number;
+  payload?: PriceForecastChartPoint;
+  dataKey?: string;
+  stroke?: string;
+  value?: number;
+}) => {
+  const { cx, cy, payload, dataKey, stroke, value } = props;
+
+  // 미래 예측 데이터가 아니거나 값이 없으면 렌더링하지 않음
+  if (!payload || !payload.isForecast || typeof value !== 'number') {
+    return null;
+  }
+
+  // 각 forecast 라인의 끝점에만 표시
+  if (
+    dataKey !== 'forecastHigh' &&
+    dataKey !== 'forecastAvg' &&
+    dataKey !== 'forecastLow'
+  ) {
+    return null;
+  }
+
+  if (typeof cx !== 'number' || typeof cy !== 'number') {
+    return null;
+  }
+
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill="#fff"
+        stroke={stroke || '#bf4b3e'}
+        strokeWidth={2}
+      />
+      <text
+        x={cx}
+        y={cy - 12}
+        textAnchor="middle"
+        fill={stroke || '#bf4b3e'}
+        fontSize={11}
+        fontWeight={600}
+      >
+        {formatPrice(value)}
+      </text>
+    </g>
+  );
+};
+
 export function PriceForecastChart({
   closePriceTrend,
   dailyAverageTargetPrices,
   targetPriceStats,
   height = 360,
 }: PriceForecastChartProps) {
-  const chartData = buildPriceForecastChartData({
-    closePriceTrend,
-    dailyAverageTargetPrices,
-    latestTargetPriceSummary: {
-      average_target_price: targetPriceStats.average_target_price,
-      max_target_price: targetPriceStats.max_target_price,
-      min_target_price: targetPriceStats.min_target_price,
-    },
-  });
+  // useMemo를 사용하여 데이터 변환 로직을 최적화
+  // fillMissingDates로 마지막 과거 데이터와 1년 뒤 미래 예측 사이의 모든 날짜를 채움
+  const chartData = useMemo(() => {
+    const rawData = buildPriceForecastChartData({
+      closePriceTrend,
+      dailyAverageTargetPrices,
+      latestTargetPriceSummary: {
+        average_target_price: targetPriceStats.average_target_price,
+        max_target_price: targetPriceStats.max_target_price,
+        min_target_price: targetPriceStats.min_target_price,
+      },
+    });
+
+    // X축 간격 문제 해결: 날짜 사이의 빈 날짜를 모두 채워넣어
+    // Recharts가 실제 시간 간격을 반영하도록 함
+    return fillMissingDates(rawData);
+  }, [closePriceTrend, dailyAverageTargetPrices, targetPriceStats]);
 
   if (process.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line no-console
@@ -182,7 +246,7 @@ export function PriceForecastChart({
   return (
     <div style={{ width: '100%', height }}>
       <ResponsiveContainer>
-        <ComposedChart data={chartData}>
+        <LineChart data={chartData}>
           <XAxis
             dataKey="date"
             tickFormatter={formatTickMonth}
@@ -212,47 +276,52 @@ export function PriceForecastChart({
           <Line
             type="monotone"
             dataKey="close"
-            stroke="#111827"
+            stroke="#6b84d4"
             strokeWidth={2}
             dot={false}
+            connectNulls={true}
             name="Close Price"
           />
           <Line
             type="monotone"
             dataKey="avgTargetHist"
-            stroke="#d2a84b"
+            stroke="#e2b053"
             strokeWidth={2}
             dot={false}
+            connectNulls={true}
             name="Avg Target (hist)"
           />
           <Line
             type="monotone"
             dataKey="forecastHigh"
-            stroke="#b0302e"
+            stroke="#bf4b3e"
             strokeWidth={1.5}
             strokeDasharray="4 4"
-            dot={false}
+            dot={<ForecastDot />}
+            connectNulls={true}
             legendType="none"
           />
           <Line
             type="monotone"
             dataKey="forecastAvg"
-            stroke="#b0302e"
+            stroke="#e2b053"
             strokeWidth={2}
             strokeDasharray="0"
-            dot={{ r: 3, stroke: '#b0302e', strokeWidth: 1, fill: '#fff' }}
+            dot={<ForecastDot />}
+            connectNulls={true}
             legendType="none"
           />
           <Line
             type="monotone"
             dataKey="forecastLow"
-            stroke="#b0302e"
+            stroke="#6b84d4"
             strokeWidth={1.5}
             strokeDasharray="4 4"
-            dot={false}
+            dot={<ForecastDot />}
+            connectNulls={true}
             legendType="none"
           />
-        </ComposedChart>
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

@@ -5,7 +5,9 @@ import styled from 'styled-components';
 export const Navbar: React.FC = () => {
   return (
     <NavbarContainer>
-      <Logo to="/">AIM</Logo>
+      <Logo to="/">
+        <LogoImage src="/logo1.png" alt="AIM Logo" />
+      </Logo>
       <NavLinks>
         <NavItem to="/" end>
           홈
@@ -40,10 +42,18 @@ const NavbarContainer = styled.header`
 `;
 
 const Logo = styled(Link)`
-  font-size: 20px;
-  font-weight: 700;
-  color: #111827;
+  display: flex;
+  align-items: center;
   text-decoration: none;
+  height: 48px;
+`;
+
+const LogoImage = styled.img`
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  cursor: pointer;
+  border-radius: 12px;
 `;
 
 const NavLinks = styled.nav`
