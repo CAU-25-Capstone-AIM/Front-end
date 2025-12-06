@@ -79,11 +79,11 @@ const Tag = styled.span`
 
 const RankBadge = styled.div`
   padding: 4px 12px;
-  background-color: #f0f0f0;
+  background-color: #2563eb;
   border-radius: 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #ffffff;
 `;
 
 const MetricsGrid = styled.div`
