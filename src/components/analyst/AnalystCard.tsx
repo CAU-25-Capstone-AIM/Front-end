@@ -1,16 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
+import { formatCurrency, formatDate } from '../../utils/format';
+
+type AnalystCardVariant = 'default' | 'stockDetail';
 
 type AnalystCardProps = {
   name: string;
   firm: string;
   rank?: number;
   sectors: string[];
-  accuracy: number;
-  avgReturn: number;
-  targetError: number;
+  accuracy?: number;
+  avgReturn?: number;
+  targetError?: number;
   compositeScore?: number;
   onClickDetail?: () => void;
+  variant?: AnalystCardVariant;
+  // stockDetail variant 전용 필드
+  latestOpinion?: string | null;
+  hiddenOpinion?: string | null;
+  latestTargetPrice?: number | null;
+  latestReportDate?: string | null;
 };
 
 const Container = styled.div<{ $clickable: boolean }>`
@@ -120,6 +129,72 @@ const ScoreValue = styled.span`
   color: #333;
 `;
 
+// 기본 메트릭 (정답률, 평균 수익률, 목표가 오차율)
+const MetricsDefault: React.FC<{
+  accuracy?: number | null;
+  avgReturn?: number | null;
+  targetError?: number | null;
+}> = ({ accuracy, avgReturn, targetError }) => (
+  <MetricsGrid>
+    <MetricItem>
+      <MetricLabel>정답률</MetricLabel>
+      <MetricValue>{accuracy != null ? `${accuracy}%` : '-'}</MetricValue>
+    </MetricItem>
+    <MetricItem>
+      <MetricLabel>평균 수익률</MetricLabel>
+      <MetricValue>{avgReturn != null ? `${avgReturn}%` : '-'}</MetricValue>
+    </MetricItem>
+    <MetricItem>
+      <MetricLabel>목표가 오차율</MetricLabel>
+      <MetricValue>{targetError != null ? `${targetError}%` : '-'}</MetricValue>
+    </MetricItem>
+  </MetricsGrid>
+);
+
+// 종목 상세 페이지용 메트릭 (최신 의견, 최신 목표가, 최신 리포트)
+const MetricsStockDetail: React.FC<{
+  latestOpinion?: string | null;
+  hiddenOpinion?: string | null;
+  latestTargetPrice?: number | null;
+  latestReportDate?: string | null;
+}> = ({ latestOpinion, hiddenOpinion, latestTargetPrice, latestReportDate }) => {
+  // latest_opinion / hidden_opinion 형식으로 표시
+  let opinionDisplay: React.ReactNode = '-';
+
+  if (latestOpinion && hiddenOpinion) {
+    // 예시: "BUY / 매수" 형태
+    opinionDisplay = (
+      <>
+        {latestOpinion} / <span style={{ color: '#2563eb' }}>{hiddenOpinion}</span>
+      </>
+    );
+  } else if (hiddenOpinion) {
+    opinionDisplay = hiddenOpinion;
+  } else if (latestOpinion) {
+    opinionDisplay = latestOpinion;
+  }
+
+  return (
+    <MetricsGrid>
+      <MetricItem>
+        <MetricLabel>
+          <span style={{ fontWeight: 400, color: '#666' }}>최신 의견/</span>
+          <span style={{ fontWeight: 700, color: '#2563eb' }}>AIM&apos;s opinion</span>
+        </MetricLabel>
+        <MetricValue>{opinionDisplay}</MetricValue>
+      </MetricItem>
+      <MetricItem>
+        <MetricLabel>최신 목표가</MetricLabel>
+        <MetricValue>{formatCurrency(latestTargetPrice)}</MetricValue>
+      </MetricItem>
+      <MetricItem>
+        <MetricLabel>최신 리포트</MetricLabel>
+        <MetricValue>{formatDate(latestReportDate)}</MetricValue>
+      </MetricItem>
+    </MetricsGrid>
+  );
+};
+
 export const AnalystCard: React.FC<AnalystCardProps> = ({
   name,
   firm,
@@ -130,8 +205,14 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
   targetError,
   compositeScore,
   onClickDetail,
+  variant = 'default',
+  latestOpinion,
+  hiddenOpinion,
+  latestTargetPrice,
+  latestReportDate,
 }) => {
   const clickable = Boolean(onClickDetail);
+  const isStockDetail = variant === 'stockDetail';
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
     if (!clickable) {
@@ -165,20 +246,20 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
         </NameSection>
         {rank && <RankBadge>#{rank}</RankBadge>}
       </Header>
-      <MetricsGrid>
-        <MetricItem>
-          <MetricLabel>정답률</MetricLabel>
-          <MetricValue>{accuracy}%</MetricValue>
-        </MetricItem>
-        <MetricItem>
-          <MetricLabel>평균 수익률</MetricLabel>
-          <MetricValue>{avgReturn}%</MetricValue>
-        </MetricItem>
-        <MetricItem>
-          <MetricLabel>목표가 오차율</MetricLabel>
-          <MetricValue>{targetError}%</MetricValue>
-        </MetricItem>
-      </MetricsGrid>
+      {isStockDetail ? (
+        <MetricsStockDetail
+          latestOpinion={latestOpinion}
+          hiddenOpinion={hiddenOpinion}
+          latestTargetPrice={latestTargetPrice}
+          latestReportDate={latestReportDate}
+        />
+      ) : (
+        <MetricsDefault
+          accuracy={accuracy}
+          avgReturn={avgReturn}
+          targetError={targetError}
+        />
+      )}
       {compositeScore !== undefined && (
         <ScoreSection>
           <ScoreLabel>AIM's Score</ScoreLabel>

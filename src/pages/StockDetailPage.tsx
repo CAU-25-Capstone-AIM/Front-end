@@ -7,6 +7,7 @@ import { AnalystSortControl } from '../components/analyst/AnalystSortControl';
 import { PriceForecastChart } from '../components/charts/PriceForecastChart';
 import { useAnalystSort } from '../hooks/useAnalystSort';
 import { useStockDetail } from '../hooks/useStockDetail';
+import { formatCurrency } from '../utils/format';
 
 const PageContainer = styled.div`
   padding: 24px;
@@ -125,9 +126,6 @@ const StatusMessage = styled.div`
   background-color: #fafbfc;
 `;
 
-const formatCurrency = (value: number) =>
-  `${value.toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
-
 const formatOpinionPercent = (count: number, total: number) => {
   if (!total) {
     return '-';
@@ -169,6 +167,11 @@ export const StockDetailPage = () => {
         compositeScore: analyst.aims_score ?? 0,
       },
       aimsScore: analyst.aims_score ?? 0,
+      // stockDetail variant용 추가 필드
+      latestOpinion: analyst.latest_opinion,
+      hiddenOpinion: analyst.hidden_opinion,
+      latestTargetPrice: analyst.latest_target_price,
+      latestReportDate: analyst.latest_report_date,
     }));
     return sortAnalysts(normalized);
   }, [sortAnalysts, stock]);
@@ -290,10 +293,12 @@ export const StockDetailPage = () => {
                 name={analyst.name}
                 firm={analyst.firm}
                 sectors={analyst.sectors}
-                accuracy={analyst.accuracy ?? 0}
-                avgReturn={analyst.avgReturn ?? 0}
-                targetError={analyst.targetError ?? 0}
                 compositeScore={analyst.compositeScore}
+                variant="stockDetail"
+                latestOpinion={analyst.latestOpinion}
+                hiddenOpinion={analyst.hiddenOpinion}
+                latestTargetPrice={analyst.latestTargetPrice}
+                latestReportDate={analyst.latestReportDate}
                 onClickDetail={() => navigate(`/analysts/${analyst.id}`)}
               />
             ))}
