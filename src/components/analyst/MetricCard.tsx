@@ -112,7 +112,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       {rank && (
         <>
           <RankBadge>
-            #{rank}
+            {rank}위
             {starCount > 0 &&
               Array.from({ length: starCount }).map((_, i) => (
                 <StarIcon key={i}>★</StarIcon>

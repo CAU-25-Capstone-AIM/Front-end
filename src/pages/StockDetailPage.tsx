@@ -51,24 +51,37 @@ const OpinionSummary = styled.div`
   margin-top: 16px;
 `;
 
-const OpinionBox = styled.div`
+const OpinionBox = styled.div<{ $type: 'buy' | 'hold' | 'sell'; $isHighest: boolean }>`
   flex: 1;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: ${({ $type, $isHighest }) => {
+    if ($type === 'buy') {
+      return $isHighest ? '#fecaca' : '#fee2e2'; // 진한 빨강 : 매우 연한 빨강
+    }
+    if ($type === 'hold') {
+      return $isHighest ? '#fde68a' : '#fef3c7'; // 진한 노랑 : 매우 연한 노랑
+    }
+    if ($type === 'sell') {
+      return $isHighest ? '#bfdbfe' : '#dbeafe'; // 진한 파랑 : 매우 연한 파랑
+    }
+    return '#f8f9fa';
+  }};
   border-radius: 8px;
   text-align: center;
+  transition: background-color 0.3s ease;
 `;
 
-const OpinionLabel = styled.div`
+const OpinionLabel = styled.div<{ $isHighest: boolean }>`
   font-size: 14px;
-  color: #666;
+  color: ${({ $isHighest }) => ($isHighest ? '#1f2937' : '#666')};
   margin-bottom: 8px;
+  font-weight: ${({ $isHighest }) => ($isHighest ? '600' : '400')};
 `;
 
-const OpinionValue = styled.div`
+const OpinionValue = styled.div<{ $isHighest: boolean }>`
   font-size: 24px;
   font-weight: 700;
-  color: #333;
+  color: ${({ $isHighest }) => ($isHighest ? '#111827' : '#333')};
 `;
 
 const TargetPriceGrid = styled.div`
@@ -202,6 +215,11 @@ export const StockDetailPage = () => {
   const sellCount = consensus.sell_count ?? 0;
   const totalOpinions = buyCount + holdCount + sellCount;
 
+  // 가장 높은 비중을 가진 의견 찾기
+  const maxCount = Math.max(buyCount, holdCount, sellCount);
+  const highestOpinion =
+    maxCount === buyCount ? 'buy' : maxCount === holdCount ? 'hold' : 'sell';
+
   return (
     <PageContainer>
       <Section>
@@ -215,21 +233,21 @@ export const StockDetailPage = () => {
       <Section>
         <SectionTitle>종합 의견 요약</SectionTitle>
         <OpinionSummary>
-          <OpinionBox>
-            <OpinionLabel>매수</OpinionLabel>
-            <OpinionValue>
+          <OpinionBox $type="buy" $isHighest={highestOpinion === 'buy'}>
+            <OpinionLabel $isHighest={highestOpinion === 'buy'}>매수</OpinionLabel>
+            <OpinionValue $isHighest={highestOpinion === 'buy'}>
               {formatOpinionPercent(buyCount, totalOpinions)}
             </OpinionValue>
           </OpinionBox>
-          <OpinionBox>
-            <OpinionLabel>보유</OpinionLabel>
-            <OpinionValue>
+          <OpinionBox $type="hold" $isHighest={highestOpinion === 'hold'}>
+            <OpinionLabel $isHighest={highestOpinion === 'hold'}>보유</OpinionLabel>
+            <OpinionValue $isHighest={highestOpinion === 'hold'}>
               {formatOpinionPercent(holdCount, totalOpinions)}
             </OpinionValue>
           </OpinionBox>
-          <OpinionBox>
-            <OpinionLabel>매도</OpinionLabel>
-            <OpinionValue>
+          <OpinionBox $type="sell" $isHighest={highestOpinion === 'sell'}>
+            <OpinionLabel $isHighest={highestOpinion === 'sell'}>매도</OpinionLabel>
+            <OpinionValue $isHighest={highestOpinion === 'sell'}>
               {formatOpinionPercent(sellCount, totalOpinions)}
             </OpinionValue>
           </OpinionBox>
