@@ -361,6 +361,12 @@ export const AnalystDetailPage = () => {
         <SectionTitle>핵심 지표</SectionTitle>
         <MetricsGrid>
           <MetricCard
+            label="AIM's Score"
+            value={analyst.metrics.aimsScore.toFixed(0)}
+            rank={analyst.rank}
+            totalAnalysts={analyst.totalAnalysts}
+          />
+          <MetricCard
             label="정답률"
             value={formatPercent(analyst.metrics.accuracyRate)}
           />
@@ -379,10 +385,6 @@ export const AnalystDetailPage = () => {
           <MetricCard
             label="평균 대비 목표가 정확도"
             value={formatPercent(analyst.metrics.avgTargetDiff)}
-          />
-          <MetricCard
-            label="AIM's Score"
-            value={analyst.metrics.aimsScore.toFixed(0)}
           />
         </MetricsGrid>
       </Section>

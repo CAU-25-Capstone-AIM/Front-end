@@ -6,6 +6,8 @@ type MetricCardProps = {
   value: string;
   description?: string;
   trend?: 'up' | 'down' | 'neutral';
+  rank?: number;
+  totalAnalysts?: number;
 };
 
 const Container = styled.div`
@@ -51,17 +53,54 @@ const Description = styled.p`
   color: #888;
 `;
 
+const RankBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: #2563eb;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+  width: fit-content;
+`;
+
+const StarIcon = styled.span`
+  color: #fbbf24;
+  font-size: 13px;
+`;
+
+const RankText = styled.span`
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+`;
+
 export const MetricCard: React.FC<MetricCardProps> = ({
   label,
   value,
   description,
   trend,
+  rank,
+  totalAnalysts,
 }) => {
   const getTrendIcon = () => {
     if (trend === 'up') return '↑';
     if (trend === 'down') return '↓';
     return '→';
   };
+
+  // 등수에 따른 별 개수 계산
+  const getStarCount = (rankValue: number): number => {
+    if (rankValue >= 1 && rankValue <= 20) return 3;
+    if (rankValue >= 21 && rankValue <= 60) return 2;
+    if (rankValue >= 61 && rankValue <= 100) return 1;
+    return 0;
+  };
+
+  const starCount = rank ? getStarCount(rank) : 0;
 
   return (
     <Container>
@@ -70,6 +109,20 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         <Value>{value}</Value>
         {trend && <TrendIcon trend={trend}>{getTrendIcon()}</TrendIcon>}
       </ValueRow>
+      {rank && (
+        <>
+          <RankBadge>
+            #{rank}
+            {starCount > 0 &&
+              Array.from({ length: starCount }).map((_, i) => (
+                <StarIcon key={i}>★</StarIcon>
+              ))}
+          </RankBadge>
+          {totalAnalysts && (
+            <RankText>전체 {totalAnalysts}명 중</RankText>
+          )}
+        </>
+      )}
       {description && <Description>{description}</Description>}
     </Container>
   );

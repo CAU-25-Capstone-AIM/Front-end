@@ -69,6 +69,8 @@ export type AnalystDetail = {
   id: number;
   name: string;
   firm: string;
+  rank: number;
+  totalAnalysts: number;
   metrics: {
     accuracyRate: number;
     returnRate: number;
@@ -88,6 +90,8 @@ export const mapAnalystDetailFromDTO = (
     id: dto.analyst_id,
     name: dto.analyst_name,
     firm: dto.firm_name,
+    rank: dto.rank,
+    totalAnalysts: dto.total_analysts,
     metrics: {
       accuracyRate: fallbackNumber(dto.accuracy_rate),
       returnRate: fallbackNumber(dto.return_rate),

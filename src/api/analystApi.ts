@@ -12,6 +12,9 @@ export type AnalystMetricsDTO = {
   avg_return_diff: number;
   avg_target_diff: number;
   aims_score: number;
+  report_count: number;
+  rank: number;
+  total_analysts: number;
 };
 
 export type GetAnalystMetricsResponse = {
@@ -35,6 +38,8 @@ export type AnalystDetailDTO = {
   avg_return_diff: number;
   avg_target_diff: number;
   aims_score: number;
+  rank: number;
+  total_analysts: number;
   covered_stocks: {
     stock_id: number;
     stock_name: string;
@@ -73,12 +78,12 @@ export async function getAnalystRankings(
   const rawList = response.data?.ranking_list ?? [];
   console.log('[getAnalystRankings] raw ranking_list:', rawList);
 
-  const mapped = rawList.map((dto, index): AnalystRankingEntry => ({
+  const mapped = rawList.map((dto): AnalystRankingEntry => ({
     id: String(dto.analyst_id),
     name: dto.analyst_name,
     firm: dto.firm_name,
     sectors: [], // TODO: 추후 서버 섹터 필드 매핑
-    rank: index + 1,
+    rank: dto.rank, // ✅ 백엔드에서 받은 rank 사용
     metrics: {
       accuracy: fallbackNumber(dto.accuracy_rate),
       avgReturn: fallbackNumber(dto.return_rate),

@@ -284,7 +284,7 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
             </TagContainer>
           )}
         </NameSection>
-        {rank && isStockDetail && starCount > 0 ? (
+        {rank && starCount > 0 ? (
           <RankWithStars>
             #{rank}
             {Array.from({ length: starCount }).map((_, i) => (
