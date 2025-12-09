@@ -7,7 +7,8 @@ type AnalystCardVariant = 'default' | 'stockDetail';
 type AnalystCardProps = {
   name: string;
   firm: string;
-  rank?: number;
+  rank?: number; // 화면 표시용 순위 (정렬 후 순서)
+  aimsRank?: number; // 별 개수 계산용 (AIM's Score 기준 고정 순위)
   sectors: string[];
   accuracy?: number;
   avgReturn?: number;
@@ -236,6 +237,7 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
   name,
   firm,
   rank,
+  aimsRank,
   sectors,
   accuracy,
   avgReturn,
@@ -259,7 +261,8 @@ export const AnalystCard: React.FC<AnalystCardProps> = ({
     return 0;
   };
 
-  const starCount = rank ? getStarCount(rank) : 0;
+  // 별 개수는 aimsRank 기준으로 계산 (없으면 rank 사용)
+  const starCount = aimsRank ? getStarCount(aimsRank) : rank ? getStarCount(rank) : 0;
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
     if (!clickable) {

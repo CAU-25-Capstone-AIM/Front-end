@@ -19,9 +19,9 @@ const slides: HeroSlideConfig[] = [
   {
     id: 'intro',
     title: '매수 편향된 리포트 대신,\n성과로 검증된 인사이트',
-    subtitle: '애널리스트 리포트의 매수 쏠림을 걷어내고, 실제 성과로 신뢰도를 평가합니다.',
+    subtitle: '애널리스트 리포트의 매수 쏠림을 걷어내고,\n실제 성과로 신뢰도를 평가합니다.',
     description:
-      'Strong Buy부터 Strong Sell까지 의견 분포를 확인하고, 수익률과 목표가 오차율로 애널리스트를 비교하세요.',
+      'Strong Buy부터 Strong Sell까지 의견 분포를 확인하고,\n수익률과 목표가 오차율로 애널리스트를 비교하세요.',
     ctaLabel: 'AIM 서비스 소개 보기',
     ctaTarget: 'intro',
     illustrationType: 'intro',

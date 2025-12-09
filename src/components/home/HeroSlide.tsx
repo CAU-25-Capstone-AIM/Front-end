@@ -7,7 +7,7 @@ export type HeroSlideProps = {
   onClickCta: (target: HeroSlideConfig['ctaTarget']) => void;
 };
 
-const titleWithLineBreak = (value: string) => {
+const textWithLineBreak = (value: string) => {
   const lines = value.split('\n');
   return lines.map((line, index) => (
     <React.Fragment key={`${line}-${index}`}>
@@ -27,9 +27,9 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({ slide, onClickCta }) => {
   return (
     <SlideContainer>
       <LeftColumn>
-        <Title>{titleWithLineBreak(slide.title)}</Title>
-        <Subtitle>{slide.subtitle}</Subtitle>
-        <Description>{slide.description}</Description>
+        <Title>{textWithLineBreak(slide.title)}</Title>
+        <Subtitle>{textWithLineBreak(slide.subtitle)}</Subtitle>
+        <Description>{textWithLineBreak(slide.description)}</Description>
         <CtaButton type="button" onClick={() => onClickCta(slide.ctaTarget)}>
           {slide.ctaLabel}
         </CtaButton>

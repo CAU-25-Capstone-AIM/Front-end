@@ -182,12 +182,13 @@ export const MainAnalystRankingPage = () => {
         )}
         {!loading &&
           !error &&
-          currentPageAnalysts.map((analyst) => (
+          currentPageAnalysts.map((analyst, index) => (
             <AnalystCard
               key={analyst.id}
               name={analyst.name}
               firm={analyst.firm}
-              rank={analyst.rank}
+              rank={startIndex + index + 1}
+              aimsRank={analyst.rank}
               sectors={analyst.sectors}
               accuracy={analyst.metrics.accuracy}
               avgReturn={analyst.metrics.avgReturn}
