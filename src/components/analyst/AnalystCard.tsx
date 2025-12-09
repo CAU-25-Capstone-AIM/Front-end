@@ -146,6 +146,13 @@ const ScoreValue = styled.span`
   color: #333;
 `;
 
+// 양수일 때 + 기호 추가하는 헬퍼 함수
+const formatWithSign = (value: number | null | undefined): string => {
+  if (value == null) return '-';
+  if (value > 0) return `+${value}%`;
+  return `${value}%`;
+};
+
 // 기본 메트릭 (정답률, 평균 수익률, 목표가 오차율)
 const MetricsDefault: React.FC<{
   accuracy?: number | null;
@@ -159,11 +166,11 @@ const MetricsDefault: React.FC<{
     </MetricItem>
     <MetricItem>
       <MetricLabel>평균 수익률</MetricLabel>
-      <MetricValue>{avgReturn != null ? `${avgReturn}%` : '-'}</MetricValue>
+      <MetricValue>{formatWithSign(avgReturn)}</MetricValue>
     </MetricItem>
     <MetricItem>
       <MetricLabel>목표가 오차율</MetricLabel>
-      <MetricValue>{targetError != null ? `${targetError}%` : '-'}</MetricValue>
+      <MetricValue>{formatWithSign(targetError)}</MetricValue>
     </MetricItem>
   </MetricsGrid>
 );

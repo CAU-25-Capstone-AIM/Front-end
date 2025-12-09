@@ -339,6 +339,12 @@ export const AnalystDetailPage = () => {
   const formatPercent = (value: number, digits = 1) =>
     `${value.toFixed(digits)}%`;
 
+  // 양수일 때 + 기호 추가
+  const formatPercentWithSign = (value: number, digits = 1) => {
+    const formatted = value.toFixed(digits);
+    return value > 0 ? `+${formatted}%` : `${formatted}%`;
+  };
+
   const reportFrequency = buildReportFrequencyLastYear(analyst.reports);
 
   return (
@@ -372,19 +378,19 @@ export const AnalystDetailPage = () => {
           />
           <MetricCard
             label="평균 수익률"
-            value={formatPercent(analyst.metrics.returnRate)}
+            value={formatPercentWithSign(analyst.metrics.returnRate)}
           />
           <MetricCard
             label="목표가 오차율"
-            value={formatPercent(analyst.metrics.targetDiffRate)}
+            value={formatPercentWithSign(analyst.metrics.targetDiffRate)}
           />
           <MetricCard
             label="평균 대비 수익률"
-            value={formatPercent(analyst.metrics.avgReturnDiff)}
+            value={formatPercentWithSign(analyst.metrics.avgReturnDiff)}
           />
           <MetricCard
             label="평균 대비 목표가 오차율"
-            value={formatPercent(analyst.metrics.avgTargetDiff)}
+            value={formatPercentWithSign(analyst.metrics.avgTargetDiff)}
           />
         </MetricsGrid>
       </Section>
