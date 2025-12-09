@@ -204,6 +204,7 @@ export const StockDetailPage = () => {
 
   const consensus = stock.consensus;
   const targetStats = stock.target_price_stats;
+  const aimsAverageTargetPrice = consensus.aims_average_target_price;
   const averageTargetPrice =
     targetStats?.average_target_price ?? consensus.average_target_price;
   const maxTargetPrice =
@@ -257,6 +258,12 @@ export const StockDetailPage = () => {
       <Section>
         <SectionTitle>목표가 요약</SectionTitle>
         <TargetPriceGrid>
+          <TargetPriceItem>
+            <TargetPriceLabel>AIM's 목표가</TargetPriceLabel>
+            <TargetPriceValue>
+              {formatCurrency(aimsAverageTargetPrice)}
+            </TargetPriceValue>
+          </TargetPriceItem>
           <TargetPriceItem>
             <TargetPriceLabel>평균 목표가</TargetPriceLabel>
             <TargetPriceValue>

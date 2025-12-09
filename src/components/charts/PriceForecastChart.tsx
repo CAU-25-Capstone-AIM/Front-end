@@ -68,10 +68,10 @@ const PriceForecastTooltip = ({
           : item.dataKey === 'avgTargetHist'
             ? '이전 평균 목표가'
             : item.dataKey === 'forecastHigh'
-              ? 'Forecast High'
+              ? "AIM's 예측 최고가"
               : item.dataKey === 'forecastAvg'
-                ? 'Forecast Avg'
-                : 'Forecast Low',
+                ? "AIM's 예측 평균가"
+                : "AIM's 예측 최저가",
       value: formatPrice(item.value),
     }))
     .filter((entry) => entry.value);
@@ -198,9 +198,9 @@ export function PriceForecastChart({
       closePriceTrend,
       dailyAverageTargetPrices,
       latestTargetPriceSummary: {
-        average_target_price: targetPriceStats.average_target_price,
-        max_target_price: targetPriceStats.max_target_price,
-        min_target_price: targetPriceStats.min_target_price,
+        average_target_price: targetPriceStats.aims_target_price ?? targetPriceStats.average_target_price,
+        max_target_price: targetPriceStats.aims_max_target_price ?? targetPriceStats.max_target_price,
+        min_target_price: targetPriceStats.aims_min_target_price ?? targetPriceStats.min_target_price,
       },
     });
 

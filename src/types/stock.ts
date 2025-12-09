@@ -12,6 +12,9 @@ export type StockLatestTargetPriceSummary = {
   average_target_price: number;
   max_target_price: number;
   min_target_price: number;
+  aims_target_price?: number;
+  aims_max_target_price?: number;
+  aims_min_target_price?: number;
 };
 
 export type StockPriceForecastChartPoint = {
@@ -32,6 +35,7 @@ export type StockConsensus = {
   hold_count: number;
   sell_count: number;
   average_target_price: number;
+  aims_average_target_price: number;
   upside_potential: number;
   total_reports: number;
   total_analysts: number;

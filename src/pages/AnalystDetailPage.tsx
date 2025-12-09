@@ -383,7 +383,7 @@ export const AnalystDetailPage = () => {
             value={formatPercent(analyst.metrics.avgReturnDiff)}
           />
           <MetricCard
-            label="평균 대비 목표가 정확도"
+            label="평균 대비 목표가 오차율"
             value={formatPercent(analyst.metrics.avgTargetDiff)}
           />
         </MetricsGrid>
