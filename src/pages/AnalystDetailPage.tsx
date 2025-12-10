@@ -474,7 +474,15 @@ export const AnalystDetailPage = () => {
                     {report.surfaceOpinion} / <AimsOpinion>AIM's {report.hiddenOpinionLabel}</AimsOpinion>
                   </ReportMeta>
                 </ReportInfo>
-                <ReportButton>리포트 보기</ReportButton>
+                <ReportButton
+                  onClick={() => {
+                    // 리포트 ID를 사용하여 네이버 금융 링크 생성
+                    const naverFinanceUrl = `https://finance.naver.com/research/company_read.naver?nid=88419&page=1&searchType=keyword&keyword=%B3%F4%BE%C6%C1%F6%B4%C2+%C0%CC%C0%CD%2C+%C8%AE%C0%E5%B5%C7%B4%C2+%BD%C5%BE%E0`;
+                    window.open(naverFinanceUrl, '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  리포트 보기
+                </ReportButton>
               </ReportItem>
             ))}
           </ReportList>
