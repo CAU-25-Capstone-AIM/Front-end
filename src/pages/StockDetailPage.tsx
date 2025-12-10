@@ -232,7 +232,7 @@ export const StockDetailPage = () => {
       </Section>
 
       <Section>
-        <SectionTitle>종합 의견 요약</SectionTitle>
+        <SectionTitle>AIM's 종합 의견 요약</SectionTitle>
         <OpinionSummary>
           <OpinionBox $type="buy" $isHighest={highestOpinion === 'buy'}>
             <OpinionLabel $isHighest={highestOpinion === 'buy'}>매수</OpinionLabel>
@@ -285,7 +285,7 @@ export const StockDetailPage = () => {
         </TargetPriceGrid>
         <UpsidePotential>
           <UpsideText>
-            상승 여력: {consensus.upside_potential.toFixed(2)}%
+            AIM's 상승 여력: {consensus.upside_potential.toFixed(2)}%
           </UpsideText>
         </UpsidePotential>
       </Section>

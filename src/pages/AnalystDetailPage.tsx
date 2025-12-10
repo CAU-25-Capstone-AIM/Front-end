@@ -180,6 +180,11 @@ const ReportMeta = styled.div`
   color: #666;
 `;
 
+const AimsOpinion = styled.span`
+  color: #2563eb;
+  font-weight: 600;
+`;
+
 const ReportButton = styled.button`
   padding: 8px 16px;
   border: 1px solid #007bff;
@@ -466,7 +471,7 @@ export const AnalystDetailPage = () => {
                   <ReportTitle>{report.title}</ReportTitle>
                   <ReportMeta>
                     {report.date} · {report.stockName} ({report.stockCode}) ·{' '}
-                    {report.surfaceOpinion} / {report.hiddenOpinionLabel}
+                    {report.surfaceOpinion} / <AimsOpinion>AIM's {report.hiddenOpinionLabel}</AimsOpinion>
                   </ReportMeta>
                 </ReportInfo>
                 <ReportButton>리포트 보기</ReportButton>
