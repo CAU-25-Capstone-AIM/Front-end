@@ -36,7 +36,11 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({ slide, onClickCta }) => {
       </LeftColumn>
       <RightColumn>
         <IllustrationBubble>
-          <IllustrationLabel>{illustrationLabel[slide.illustrationType]}</IllustrationLabel>
+          {slide.imageUrl ? (
+            <IllustrationImage src={slide.imageUrl} alt={illustrationLabel[slide.illustrationType]} />
+          ) : (
+            <IllustrationLabel>{illustrationLabel[slide.illustrationType]}</IllustrationLabel>
+          )}
         </IllustrationBubble>
       </RightColumn>
     </SlideContainer>
@@ -105,9 +109,9 @@ const RightColumn = styled.div`
 `;
 
 const IllustrationBubble = styled.div`
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
+  width: 350px;
+  height: 350px;
+  border-radius: 16px;
   background: #eef2ff;
   display: flex;
   align-items: center;
@@ -119,6 +123,13 @@ const IllustrationLabel = styled.span`
   font-size: 20px;
   font-weight: 700;
   color: #4338ca;
+`;
+
+const IllustrationImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
 `;
 
 export default HeroSlide;

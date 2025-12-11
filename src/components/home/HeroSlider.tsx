@@ -11,6 +11,7 @@ export type HeroSlideConfig = {
   ctaLabel: string;
   ctaTarget: 'intro' | 'analystRanking' | 'stockRanking' | 'sectorRanking';
   illustrationType: 'intro' | 'analyst' | 'sector';
+  imageUrl?: string;
 };
 
 const AUTO_INTERVAL_MS = 5000;
@@ -25,6 +26,7 @@ const slides: HeroSlideConfig[] = [
     ctaLabel: 'AIM 서비스 소개 보기',
     ctaTarget: 'intro',
     illustrationType: 'intro',
+    imageUrl: '/home_AIM.png',
   },
   {
     id: 'analyst',
@@ -34,6 +36,7 @@ const slides: HeroSlideConfig[] = [
     ctaLabel: '애널리스트 랭킹 보러가기',
     ctaTarget: 'analystRanking',
     illustrationType: 'analyst',
+    imageUrl: '/home_analyst.png',
   },
   {
     id: 'asset',
@@ -43,6 +46,7 @@ const slides: HeroSlideConfig[] = [
     ctaLabel: '종목 랭킹 보러가기',
     ctaTarget: 'stockRanking',
     illustrationType: 'sector',
+    imageUrl: '/home_sector.png',
   },
 ];
 
