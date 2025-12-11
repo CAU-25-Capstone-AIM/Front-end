@@ -24,6 +24,7 @@ export type SortableAnalyst = {
   returnRate?: number;
   targetError?: number;
   aimsScore?: number;
+  rank?: number;
 };
 
 const getValueByKey = (item: SortableAnalyst, key: AnalystSortKey): number | undefined => {
@@ -87,7 +88,10 @@ export function useAnalystSort(
               : Number.NEGATIVE_INFINITY;
 
         if (resolvedA === resolvedB) {
-          return 0;
+          // 동점일 경우 rank로 2차 정렬 (rank가 낮을수록 앞에 배치)
+          const aRank = a.rank ?? Number.POSITIVE_INFINITY;
+          const bRank = b.rank ?? Number.POSITIVE_INFINITY;
+          return aRank - bRank;
         }
         return direction === 'asc'
           ? resolvedA - resolvedB
