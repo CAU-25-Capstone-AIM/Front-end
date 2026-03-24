@@ -1,4 +1,4 @@
-\# AIM (Analyst Information Management)
+# AIM (Analyst Information Management)
 
 증권 애널리스트의 신뢰도를 평가하고 투자 인사이트를 제공하는 종합 정보 관리 시스템
 
@@ -78,7 +78,6 @@
 ## 기술 스택
 
 ### Frontend
-- **TypeScipt** - TypeScript 5.9.3 버전
 - **React.JS** - 최신 리액트 버전
 
 ### AI
@@ -179,14 +178,15 @@ spring:
 
 | 이름 | 역할 | 담당 업무 |
 |------|------|-----------|
+| **오재우** | Backend | 백엔드 시스템 설계 및 구현, REST API 개발 |
 | **배성빈** | AI | Hidden Opinion 분석 모델 개발, AIMS Score 알고리즘 설계 |
-| **최현승** | FullStack | 사용자 인터페이스 개발, API 연동, 백엔드 시스템 설계 및 구현, REST API 개발 |
+| **최현승** | Frontend | 사용자 인터페이스 개발, API 연동 |
 
 ## 프로젝트 정보
 
 - **프로젝트 기간**: 2025년 9월 ~ 2025년 12월
 - **프로젝트 유형**: Capstone Design Project (Aim)
-- **개발 환경**: React, Pytorch, Spring Boot 3.x, Java 21, MySQL 8
+- **개발 환경**: React.js, Pytorch, Spring Boot 3.x, Java 21, MySQL 8
 
 ---
 
